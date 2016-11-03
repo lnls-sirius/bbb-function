@@ -72,7 +72,7 @@ def simar():
                 Type.SIMAR,
                 0,
                 SIMAR,
-                "Connected: [None]. Auto Configuration: {}".format(simar.autoConfig_Available()),
+                "Connected: [{}]. Auto Configuration: {}".format(simar.addr(), simar.autoConfig_Available()),
             )
 
 def counting_pru():

@@ -94,7 +94,7 @@ class Simar_addr:
         self.logger = logging.getLogger()
         self.logger.info("Checking Board Address - SIMAR")
 
-        self.addr_pins = ["P9_26", "P9_25", "P9_24", "P9_23", "P9_41"]
+        self.addr_pins = ["P9_41", "P9_23", "P9_24", "P9_25", "P9_26"]
 
         for pin in self.addr_pins:
             GPIO.setup(pin, GPIO.IN)
@@ -107,7 +107,7 @@ class Simar_addr:
     def addr(self):
         addressing = 0
         for pow, pin in enumerate(self.addr_pins[:-2]):
-            addressing += GPIO.input("P9_41")*(2**pow)
+            addressing += GPIO.input(pin)*(2**pow)
 
         return(addressing)
 
@@ -117,3 +117,9 @@ class Simar_addr:
         volts = ADC.read("P9_33") * 1.8
 
         return(abs(volts * 11 - 5) < 0.2)
+
+if __name__ == "__main__":
+    simar = Simar_addr()
+    print(f"Is Simar? {simar.IsSimar()}\
+            Addressing: {simar.addr()}\
+            AutoConfig: {simar.autoConfig_Available()}")

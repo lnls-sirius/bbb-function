@@ -17,8 +17,14 @@ logger = logging.getLogger('AutoConfig')
 
 
 # AUTOCONFIG: RTS and CTS pins tied together (jumper)
-AUTOCONFIG = True #serial.Serial("/dev/ttyUSB0").cts
+for i in range(5):
+    try:
+        AUTOCONFIG = serial.Serial("/dev/ttyUSB0").cts
+    except:
+        AUTOCONFIG = False
+        sleep(2)
 
+        
 class GetData():
     def __init__(self, datafile=AUTOCONFIG_FILE, subnet = ""):
         try:

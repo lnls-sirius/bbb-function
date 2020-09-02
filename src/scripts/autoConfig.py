@@ -5,6 +5,7 @@ import serial
 import subprocess
 import json
 import re
+import time
 from xlrd import open_workbook
 from consts import *
 from bbb import BBB
@@ -22,7 +23,7 @@ for i in range(5):
         AUTOCONFIG = serial.Serial("/dev/ttyUSB0").cts
     except:
         AUTOCONFIG = False
-        sleep(2)
+        time.sleep(2)
 
         
 class GetData():

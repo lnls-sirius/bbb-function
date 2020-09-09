@@ -8,6 +8,11 @@ import struct
 import Adafruit_BBIO.GPIO as GPIO
 from PRUserial485 import PRUserial485_open,PRUserial485_write, PRUserial485_read, PRUserial485_close, PRUserial485_address
 from serial import Serial, STOPBITS_TWO, SEVENBITS, PARITY_EVEN
+from persist import persist_info
+from consts import *
+
+sys.path.append(os.path.join(os.path.dirname(os.path.realpath(__file__)), '../../../'))
+from bbb import Type
 
 logger = logging.getLogger('Whoami')
 
@@ -26,11 +31,7 @@ else:
 '''
 
 
-from persist import persist_info
-from consts import *
 
-sys.path.append(os.path.join(os.path.dirname(os.path.realpath(__file__)), '../../../'))
-from bbb import Type
 
 PIN_FTDI_PRU = "P8_11"      # 0: FTDI / 1: PRU
 FTDI = 0

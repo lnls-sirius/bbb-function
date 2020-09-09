@@ -184,6 +184,7 @@ function pru_power_supply {
 
     echo "Running eth-bridge-pru-serial485 on ports 5000 and 6000"
     systemctl start eth-bridge-pru-serial485.service
+    sleep 5
 
     echo "Running Ponte-py at port 4000"
     pushd /root/ponte-py
@@ -198,8 +199,6 @@ function serial_thermo {
         ./rsync_beaglebone.sh serial-thermo
     popd
     overlay_PRUserial485
-    # @todo
-    # - Rodar IOC e scripts python
 }
 
 function mks {
@@ -216,12 +215,12 @@ function uhv {
 
 function mbtemp {
     overlay_PRUserial485
-    echo  "Starting socat with:"
+    echo  "Starting socat..."
     socat TCP-LISTEN:5003,reuseaddr,fork,nodelay,range=${SERVER_IP_ADDR} FILE:${SOCAT_DEVICE},b${BAUDRATE}
 }
 
 function socat_devices {
     overlay_PRUserial485
-    echo  "Starting socat with:"
+    echo  "Starting socat..."
     socat TCP-LISTEN:${SOCAT_PORT},reuseaddr,fork,nodelay,range=${SERVER_IP_ADDR} FILE:${SOCAT_DEVICE},b${BAUDRATE},rawer
 }

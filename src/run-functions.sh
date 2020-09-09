@@ -20,8 +20,10 @@ popd
 wait-for-it ${RSYNC_SERVER}:873 --timeout=5
 if [ $? -eq 0 ]; then
         # Updating bbb-function files
+        pushd ${FUNCTION_BASE}/src/scripts/
         echo Synchronizing bbb-function files
-        ./function/script/rsync_beaglebone.sh bbb-function
+        ./rsync_beaglebone.sh bbb-function
+        popd
 #        if [ $? -eq 0 ]; then
 #            echo New version of bbb-function. Making and restarting services...
 #            pushd ${FUNCTION_BASE}

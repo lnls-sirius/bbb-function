@@ -93,9 +93,8 @@ def power_supply_pru():
                 if not ps_name in ps_names:
                     ps_names.append(ps_name)
             time.sleep(0.1)
-#        PRUserial485_close()
-        if(len(devices)):
-            persist_info(Type.POWER_SUPPLY, 6000000, PRU_POWER_SUPPLY, 'PS model {}. Connected: {}. Names: {}'.format(ps_model, devices, ps_names))
+        # Save info
+        persist_info(Type.POWER_SUPPLY, 6000000, PRU_POWER_SUPPLY, 'PS model {}. Connected: {}. Names: {}'.format(ps_model, devices, ps_names))
 
 
 

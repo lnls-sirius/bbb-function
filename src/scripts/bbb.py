@@ -130,7 +130,6 @@ class BBB:
         """
         with open(self.configuration_file_path, 'rb') as file:
             self.node = pickle.load(file)
-            print("open")
             file.close()
             self.logger.info("Node configuration file read successfully.")
 
@@ -465,6 +464,9 @@ class Node():
     This class represents a Controls group's host. Each host has a symbolic name, a valid IP address, a type
     and the sector where it is located.
     """
+
+    KEY_PREFIX = 'Node:'
+
     def __init__(self, **kwargs):
         """
         Initializes a node instance.
@@ -520,3 +522,10 @@ class Node():
                     node_dict[key] = Type(code=Type.UNDEFINED)
 
             setattr(self, key, node_dict[key])
+
+
+    def get_key(self):
+        """
+        :return: returns the node's key with prefix
+        """
+        return (Node.KEY_PREFIX + str(self.ip_address)).replace(' ', '')

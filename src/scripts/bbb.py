@@ -37,6 +37,8 @@ class BBB:
         self.interface_name = interface
 
         self.read_node_parameters()
+        self.node.state = NodeState.CONNECTED
+        self.node.state_string = NodeState.to_string(self.node.state)
 
         self.node.type = Type.from_code(Type.UNDEFINED)
         self.node.ip_address = str(ipaddress.ip_address(self.get_ip_address()[0]))
@@ -77,7 +79,6 @@ class BBB:
         Reboots this node.
         """
         self.logger.info("Setting state to reboot ... Waiting for the next ping ...")
-        self.node.update_state(NodeState.REBOOTING)
         time.sleep(3.)
         self.logger.info("Rebooting system.")
         os.system('reboot')
@@ -482,7 +483,7 @@ class Node():
 
         self.name = kwargs.get('name', 'r0n0')
         self.ip_address = kwargs.get('ip_address', '10.128.0.0')
-        self.state = kwargs.get('state', NodeState.DISCONNECTED)
+        self.state = kwargs.get('state', NodeState.CONNECTED)
         self.state_string = NodeState.to_string(self.state)
         self.type = kwargs.get('type_node', Type(code=Type.UNDEFINED))
         self.sector = kwargs.get('sector', 1)

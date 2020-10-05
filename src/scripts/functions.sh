@@ -204,13 +204,12 @@ function serial_thermo {
 function mks {
     sync_PRUserial485
     overlay_PRUserial485
-    socat TCP-LISTEN:5002,reuseaddr,fork,nodelay FILE:/dev/ttyUSB0,b115200,rawer
-    # ${DAEMON_BASE}/src/scripts/tcpSerial.py -p 5002 -b 115200 -t 0.15 --debug --serial-buffer-timeout 0.100
+    socat TCP-LISTEN:5002,reuseaddr,fork,nodelay FILE:/dev/ttyUSB0,b115200
 }
 
 function uhv {
     overlay_PRUserial485
-    ${FUNCTION_BASE}/src/scripts/tcpSerial.py -p 5004 -b 38400  -t 0.23 --debug --serial-buffer-timeout 0.075
+    socat TCP-LISTEN:5004,reuseaddr,fork,nodelay,range=${SERVER_IP_ADDR} FILE:${SOCAT_DEVICE},b${BAUDRATE}
 }
 
 function mbtemp {

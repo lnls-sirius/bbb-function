@@ -55,7 +55,7 @@ if __name__ == '__main__':
         mybbb = BBB()
         mybbb.type = Device_Type[mybbb.node.type.code]
         mybbb.ids = [int(s) for s in re.findall(r'\d+', mybbb.node.details.split('\t')[0])]
-        mybbb.currentIP = str(mybbb.get_ip_address()[0])
+        mybbb.currentIP = str(mybbb.get_network_specs()[1])
         mybbb.currentSubnet = mybbb.currentIP.split('.')[2]
 
         # Get devices from this subnet from the ConfigurationTable
@@ -134,3 +134,4 @@ if __name__ == '__main__':
             except:
                 logger.info("BBB configuration not found ! Keeping DHCP")
         
+

@@ -1,5 +1,4 @@
 #!/usr/bin/python-sirius
-import ipaddress
 import logging
 import pickle
 import os
@@ -41,7 +40,7 @@ class BBB:
         self.node.state_string = NodeState.to_string(self.node.state)
 
         self.node.type = Type.from_code(Type.UNDEFINED)
-        self.node.ip_address = str(ipaddress.ip_address(self.get_ip_address()[0]))
+        self.node.ip_type, self.node.ip_address, self.node.nameservers = self.get_network_specs()
 
         self.current_config_json_mtime = None
 
@@ -60,7 +59,7 @@ class BBB:
                     config = json.load(f)
                     self.current_config_json_mtime = config_json_mtime
                     self.node.type.code = int(config['device'])
-                    self.node.details  = '{}\tbaudrate={}'.format(config['details'], config['baudrate'])
+                    self.node.details = '{}\tbaudrate={}'.format(config['details'], config['baudrate'])
                     self.node.config_time = config['time']
 
                     self.write_node_configuration()
@@ -110,7 +109,7 @@ class BBB:
             else:
                 self.logger.info("Updating current ip address from {} to DHCP.".format(self.node.ip_address))
             self.change_ip_address(dhcp_manual, new_ip_address, new_mask, new_gateway)
-            self.node.ip_address = self.get_ip_address()[0]
+            self.node.ip_type, self.node.ip_address = self.get_network_specs()[:1]
 
 
     def read_node_parameters(self):
@@ -143,18 +142,29 @@ class BBB:
             file.close()
             self.logger.info("Node configuration file updated successfully.")
 
-    def get_ip_address(self):
-        """
-        Get the host's IP address with the 'ip addr' Linux command.
-        :return: a tuple containing the host's ip address and network address.
-        """
-        command_out = subprocess.check_output("ip addr show dev {} scope global".format(self.interface_name).split()).decode('utf-8')
-
-        lines = command_out.split('\n')
-        address_line = lines[2].split()[1]
-
-        return ipaddress.IPv4Address(address_line[0:address_line.index('/')]), \
-               ipaddress.IPv4Network(address_line, strict=False)
+    def get_network_specs(self):
+        services = subprocess.check_output(['connmanctl', 'services']).decode().split('\n')
+        for service in services:
+            if 'Wired' in service:
+                network = service.split(16 * ' ')[1]
+                break
+            else:
+                network = None
+        if not network:
+            return False
+        command_out = subprocess.check_output(['connmanctl', 'services', network]).decode().split('\n')
+        nameservers = ''
+        ip_type = ''
+        ip_address = ''
+        for line in command_out:
+            # Address line
+            if 'IPv4 = ' in line:
+                ip_type = line[18:line.index(',')]
+                ip_address = line[line.index('Address=') + 8:line.index('Netmask') - 2]
+            # Nameservers line
+            if 'Nameservers = ' in line:
+                nameservers = line[line.index('=') + 4:-2]
+        return ip_type, ip_address, nameservers
 
     def change_ip_address(self, dhcp_manual, new_ip_address="", new_mask="", new_gateway=""):
         """
@@ -169,11 +179,11 @@ class BBB:
         self.logger.debug("Service for interface {} is {}.".format(self.interface_name, service))
 
         if new_ip_address != "":
-            self.logger.info('Changing current IP address from {} to {}'.format(self.get_ip_address()[0], new_ip_address))
+            self.logger.info('Changing current IP address from {} to {}'.format(self.get_network_specs()[1], new_ip_address))
             if new_gateway is None:
                 new_gateway = Sector.get_default_gateway_of_address(new_ip_address)
         else:
-            self.logger.info('Changing current IP address from {} to DHCP'.format(self.get_ip_address()[0]))
+            self.logger.info('Changing current IP address from {} to DHCP'.format(self.get_network_specs()[1]))
 
         subprocess.check_output(
             ['connmanctl config {} --ipv4 {} {} {} {}'.format(service, dhcp_manual, new_ip_address, new_mask,
@@ -181,7 +191,7 @@ class BBB:
             shell=True)
 
         time.sleep(2)
-        self.logger.debug('IP address after update is {}'.format(self.get_ip_address()[0]))
+        self.logger.debug('IP address after update is {}'.format(self.get_network_specs()[1]))
 
     def update_nameservers(self, nameserver_1 = "", nameserver_2 = ""):
         service = self.get_connman_service_name()
@@ -472,7 +482,9 @@ class Node():
         """
         Initializes a node instance.
         :param name: a node's name.
-        :param ip: string representation of a node's ip address.
+        :param ip_address: string representation of a node's ip address.
+        :param ip_type: string representation of a node's ip type
+        :param nameservers: string representation of nodes nameservers
         :param state: current node's state.
         :param type_node: current node's type.
         :param sector: current node's sector.
@@ -483,6 +495,8 @@ class Node():
 
         self.name = kwargs.get('name', 'r0n0')
         self.ip_address = kwargs.get('ip_address', '10.128.0.0')
+        self.ip_type = kwargs.get('ip_type', 'Undefined')
+        self.nameservers = kwargs.get('nameservers', '')
         self.state = kwargs.get('state', NodeState.CONNECTED)
         self.state_string = NodeState.to_string(self.state)
         self.type = kwargs.get('type_node', Type(code=Type.UNDEFINED))
@@ -530,3 +544,4 @@ class Node():
         :return: returns the node's key with prefix
         """
         return (Node.KEY_PREFIX + str(self.ip_address)).replace(' ', '')
+

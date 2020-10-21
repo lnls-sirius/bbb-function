@@ -41,6 +41,7 @@ class BBB:
 
         self.node.type = Type.from_code(Type.UNDEFINED)
         self.node.ip_type, self.node.ip_address, self.node.nameservers = self.get_network_specs()
+        self.node.sector = Sector.get_sector_by_ip_address(self.node.ip_address)
 
         self.current_config_json_mtime = None
 
@@ -270,7 +271,7 @@ class Sector:
     """
     A static class providing helper functions to manage sectors.
     """
-    SECTORS = [('Sala' + str(i).zfill(2)) for i in range(1, 21)] + ["Conectividade", "LINAC", "RF", "Fontes", "Outros"]
+    SECTORS = ['LINAC'] + [('Sala' + str(i).zfill(2)) for i in range(1, 21)] + ["LTs", "Conectividade", "Fontes", "RF", "Outros"]
 
     SUBNETS = [[ipaddress.ip_network(u'10.128.1.0/24'),
                 ipaddress.ip_network(u'10.128.255.0/24')]] + \
@@ -304,6 +305,9 @@ class Sector:
         :return: the sector that contains the given IP address.
         :raise SectorNotFoundError: IP address is not contained in any sub-network.
         """
+        if type(ip_address) is not ipaddress.IPv4Address:
+            ip_address = ipaddress.ip_address(ip_address)
+
         for idx, subnet in enumerate(Sector.SUBNETS):
             if type(subnet) is list:
                 for s in subnet:
@@ -322,6 +326,9 @@ class Sector:
         :return: the default gateway of that host. An ipaddress.IPv4Address object.
         :raise SectorNotFoundError: IP address is not contained in any sub-network.
         """
+        if type(ip_address) is not ipaddress.IPv4Address:
+            ip_address = ipaddress.ip_address(ip_address)
+
         for subnet in Sector.SUBNETS:
             if type(subnet) is list:
                 for s in subnet:

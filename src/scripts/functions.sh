@@ -2,18 +2,25 @@
 # -*- coding: utf-8 -*-
 
 function rsync_PRUserial485 {
-    echo Synchronizing pru-serial485 files
     pushd ${FUNCTION_BASE}/src/scripts/
         ./rsync_beaglebone.sh pru-serial485
+    popd
+}
+
+function rsync_SPIxCONV {
+    pushd ${FUNCTION_BASE}/src/scripts/
+        ./rsync_beaglebone.sh SPIxCONV
     popd
 }
 
 function synchronize_common {
     # Synchronize common files and folders (startup scripts, bbb-daemon, rsync script, etc)
     pushd ${FUNCTION_BASE}/src/scripts/
-        echo "Synchronizing startup scripts and pru-serial485"
+        echo "Synchronizing startup scripts and pru-serial485 and SPIxCONV"
         ./rsync_beaglebone.sh startup-scripts
         rsync_PRUserial485
+        rsync_SPIxCONV
+
     popd
 }
 

@@ -12,7 +12,7 @@ from persist import persist_info
 from consts import *
 
 from devices import  mbtemp, counting_pru, no_tty,\
-    power_supply_pru, thermo_probe, mks9376b, agilent4uhv, reset #, spixconv
+    power_supply_pru, thermo_probe, mks9376b, agilent4uhv, reset, spixconv
 
 logging.basicConfig(level=logging.INFO,
                     format='[%(levelname)s] %(asctime)-15s %(message)s',
@@ -46,7 +46,7 @@ if __name__ == '__main__':
     # Loop until detect something
     while not path.isfile(RES_FILE) or not path.isfile(BAUDRATE_FILE):
         try:
-#            spixconv()
+            spixconv()
 
             #@todo: This should be more robust !
             counting_pru()

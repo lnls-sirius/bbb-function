@@ -17,7 +17,7 @@ from bbb import Type
 logger = logging.getLogger('Whoami')
 
 SPIxCONV = False
-'''
+
 if os.path.exists('/root/SPIxCONV/software/scripts'):
     sys.path.append('/root/SPIxCONV/software/scripts')
     import init
@@ -28,7 +28,7 @@ if os.path.exists('/root/SPIxCONV/software/scripts'):
 else:
     logger.error('/root/SPIxCONV/software/scripts does not exist, SPIxCONV will always be false !')
     SPIxCONV = False
-'''
+
 
 
 

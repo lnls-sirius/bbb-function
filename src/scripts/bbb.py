@@ -110,7 +110,7 @@ class BBB:
             else:
                 self.logger.info("Updating current ip address from {} to DHCP.".format(self.node.ip_address))
             self.change_ip_address(dhcp_manual, new_ip_address, new_mask, new_gateway)
-            self.node.ip_type, self.node.ip_address = self.get_network_specs()[:1]
+            self.node.ip_type, self.node.ip_address = self.get_network_specs()[:2]
 
 
     def read_node_parameters(self):
@@ -144,28 +144,41 @@ class BBB:
             self.logger.info("Node configuration file updated successfully.")
 
     def get_network_specs(self):
-        services = subprocess.check_output(['connmanctl', 'services']).decode().split('\n')
-        for service in services:
-            if 'Wired' in service:
-                network = service.split(16 * ' ')[1]
-                break
-            else:
-                network = None
+        nameservers = '0.0.0.0'
+        ip_type = '0.0.0.0'
+        ip_address = '0.0.0.0'
+
+        services = subprocess.check_output(['connmanctl', 'services']).decode().split('\n')[:-1]
+        if services:
+            for service in services:
+                if 'Wired' in service:
+                    network = service.split(16 * ' ')[1]
+                    break
+                else:
+                    network = None
+
         if not network:
-            return False
-        command_out = subprocess.check_output(['connmanctl', 'services', network]).decode().split('\n')
-        nameservers = ''
-        ip_type = ''
-        ip_address = ''
-        for line in command_out:
-            # Address line
-            if 'IPv4 = ' in line:
-                ip_type = line[18:line.index(',')]
-                ip_address = line[line.index('Address=') + 8:line.index('Netmask') - 2]
-            # Nameservers line
-            if 'Nameservers = ' in line:
-                nameservers = line[line.index('=') + 4:-2]
+            return '0.0.0.0', '0.0.0.0', '0.0.0.0'
+
+        command_out = subprocess.check_output(['connmanctl', 'services', network]).decode().split('\n')[:-1]
+
+        if command_out:
+            for line in command_out:
+                # Address line
+                if 'IPv4 = ' in line:
+                    try:
+                        ip_type = line[18:line.index(',')]
+                        ip_address = line[line.index('Address=') + 8:line.index('Netmask') - 2]
+                    except:
+                        continue
+                # Nameservers line
+                if 'Nameservers = ' in line:
+                    try:
+                        nameservers = line[line.index('=') + 4:-2]
+                    except:
+                        continue
         return ip_type, ip_address, nameservers
+
 
     def change_ip_address(self, dhcp_manual, new_ip_address="", new_mask="", new_gateway=""):
         """

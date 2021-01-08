@@ -11,7 +11,7 @@ export RSYNC_PORT="873"
 
 pushd ${FUNCTION_BASE}/src/scripts/
     source ./../envs.sh
-    ./get_counters_ip.py
+#    ./get_counters_ip.py
     ./key_dhcp.py   #Verificar se dhcp deve ser configurado
 popd
 

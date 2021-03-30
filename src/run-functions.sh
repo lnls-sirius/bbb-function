@@ -11,8 +11,7 @@ export RSYNC_PORT="873"
 
 pushd ${FUNCTION_BASE}/src/scripts/
     source ./../envs.sh
-#    ./get_counters_ip.py
-    ./key_dhcp.py   #Verificar se dhcp deve ser configurado
+    ./dhcpConfig.py   #Verificar se dhcp deve ser configurado
 popd
 
 
@@ -24,13 +23,13 @@ if [ $? -eq 0 ]; then
         echo Synchronizing bbb-function files
         ./rsync_beaglebone.sh bbb-function
         popd
-#        if [ $? -eq 0 ]; then
-#            echo New version of bbb-function. Making and restarting services...
-#            pushd ${FUNCTION_BASE}
-#                echo "New bbb-function version! Reinstalling and restarting services..."
-#                make install
-#            popd
-#        fi
+        if [ $? -eq 0 ]; then
+            echo New version of bbb-function. Making and restarting services...
+            pushd ${FUNCTION_BASE}
+                echo "New bbb-function version! Reinstalling and restarting services..."
+                make install
+            popd
+        fi
 else
     echo "Rsync server not available for bbb-function upgrading"
 fi

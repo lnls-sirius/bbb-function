@@ -9,21 +9,25 @@ import time
 from xlrd import open_workbook
 from consts import *
 from bbb import BBB
-
+from counters_addr import Addressing
 
 logging.basicConfig(level=logging.INFO,
                     format='[%(levelname)s] %(asctime)-15s %(message)s',
                     datefmt='%d/%m/%Y %H:%M:%S')
 logger = logging.getLogger('AutoConfig')
+counters = Addressing()
 
 
 # AUTOCONFIG: RTS and CTS pins tied together (jumper)
 for i in range(5):
     try:
         AUTOCONFIG = serial.Serial("/dev/ttyUSB0").cts
-    except:
-        AUTOCONFIG = False
+        
+    except: 
+        AUTOCONFIG = counters.autoConfig_Available()
         time.sleep(2)
+    if AUTOCONFIG:
+        break
 
         
 class GetData():

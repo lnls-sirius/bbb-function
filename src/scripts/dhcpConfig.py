@@ -8,6 +8,8 @@ import serial
 import logging
 import Adafruit_BBIO.GPIO as GPIO
 from PRUserial485 import PRUserial485_address
+from counters_addr import Addressing
+
 
 logging.basicConfig(level=logging.INFO, format='[%(levelname)s] %(asctime)-15s %(message)s',
                     datefmt='%d/%m/%Y %H:%M:%S')
@@ -16,14 +18,17 @@ logger = logging.getLogger('key_dhcp')
 
 LED_PIN = "P8_28"
 
+counter = Addressing()
 
 for i in range(5):
     try:
         AUTOCONFIG = serial.Serial("/dev/ttyUSB0").cts
     except:
-        AUTOCONFIG = False
+        system("/root/counting-pru/src/DTO_CountingPRU.sh")
+        AUTOCONFIG = counter.autoConfig_Available()
         sleep(2)
-
+    if AUTOCONFIG:
+        break
 
 def dhcp():
     '''
@@ -69,7 +74,7 @@ if __name__ == '__main__':
             sleep(0.05)
             state += str(GPIO.input(pin))
 
-        if state == '101010':
+        if (state == '101010') or AUTOCONFIG:
             logger.info("Configurando DHCP")
             dhcp()
             led()

@@ -10,6 +10,7 @@ from PRUserial485 import PRUserial485_open,PRUserial485_write, PRUserial485_read
 from serial import Serial, STOPBITS_TWO, SEVENBITS, PARITY_EVEN
 from persist import persist_info
 from consts import *
+from counters_addr import Addressing
 
 sys.path.append(os.path.join(os.path.dirname(os.path.realpath(__file__)), '../../../'))
 from bbb import Type
@@ -46,6 +47,8 @@ GPIO.setup(PIN_RS232_RS485, GPIO.IN)
 
 logger = logging.getLogger('Whoami')
 
+counters = Addressing()
+
 def reset():
     """
     Reset device.json content.
@@ -58,7 +61,8 @@ def counting_pru():
     """
     logger.debug('Counting PRU')
     if PRUserial485_address() != 21 and not os.path.isfile(PORT):
-        persist_info(Type.COUNTING_PRU, 0, COUNTING_PRU)
+        os.system("/root/counting-pru/src/DTO_CountingPRU.sh")
+        persist_info(Type.COUNTING_PRU, 0, COUNTING_PRU, 'Connected: [{}]. Auto Configuration: {}'.format(counters.addr(), counters.autoConfig_Available()))
 
 
 def no_tty():

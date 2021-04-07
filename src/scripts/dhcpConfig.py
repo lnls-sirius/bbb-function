@@ -8,6 +8,7 @@ import serial
 import logging
 import Adafruit_BBIO.GPIO as GPIO
 from PRUserial485 import PRUserial485_address
+import socket
 
 logging.basicConfig(level=logging.INFO, format='[%(levelname)s] %(asctime)-15s %(message)s',
                     datefmt='%d/%m/%Y %H:%M:%S')
@@ -16,13 +17,35 @@ logger = logging.getLogger('key_dhcp')
 
 LED_PIN = "P8_28"
 
+CONFIGURED_SUBNETS = ['102','103']
 
-for i in range(5):
+
+
+'''
+if get_subnet() in CONFIGURED_SUBNETS:
+    for i in range(5):
+        try:
+            AUTOCONFIG = serial.Serial("/dev/ttyUSB0").cts
+        except:
+            AUTOCONFIG = False
+            sleep(2)
+else:
+    logger.info('Subnet not yet configured!')
+    AUTOCONFIG = False
+'''
+
+
+def get_subnet():
+    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     try:
-        AUTOCONFIG = serial.Serial("/dev/ttyUSB0").cts
-    except:
-        AUTOCONFIG = False
-        sleep(2)
+        # doesn't have to be reachable
+        s.connect(('10.128.101.100', 1))
+        IP = s.getsockname()[0]
+    except Exception:
+        IP = '127.0.0.1'
+    finally:
+        s.close()
+    return IP.split('.')[2]
 
 
 def dhcp():
@@ -51,6 +74,21 @@ if __name__ == '__main__':
 
     GPIO.setup(LED_PIN, GPIO.OUT)    #Led configuration
     GPIO.output(LED_PIN, GPIO.LOW)
+
+
+
+    if get_subnet() in CONFIGURED_SUBNETS:
+        for i in range(5):
+            try:
+                AUTOCONFIG = serial.Serial("/dev/ttyUSB0").cts
+            except:
+                AUTOCONFIG = False
+                sleep(2)
+    else:
+        logger.info('Subnet not yet configured!')
+        AUTOCONFIG = False
+
+
 
     # CONTADORA
     if device_addr == 0:

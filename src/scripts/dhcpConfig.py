@@ -21,20 +21,6 @@ CONFIGURED_SUBNETS = ['102','103']
 
 
 
-'''
-if get_subnet() in CONFIGURED_SUBNETS:
-    for i in range(5):
-        try:
-            AUTOCONFIG = serial.Serial("/dev/ttyUSB0").cts
-        except:
-            AUTOCONFIG = False
-            sleep(2)
-else:
-    logger.info('Subnet not yet configured!')
-    AUTOCONFIG = False
-'''
-
-
 def get_subnet():
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     try:

@@ -169,10 +169,9 @@ function startup_HardReset {
 
 function spixconv {
     echo SPIXCONV detected.
-    echo Synchronizing pru-serial485 and spixconv files
-    pushd ${FUNCTION_BASE}/src/scripts/
-        ./rsync_beaglebone.sh spixconv
-    popd
+#    echo Synchronizing SPIxCONV files
+#    rsync_SPIxCONV
+
     overlay_PRUserial485
     overlay_SPIxCONV
 
@@ -190,6 +189,7 @@ function pru_power_supply {
     popd
 
     echo "Running eth-bridge-pru-serial485 on ports 5000 and 6000"
+    sleep 5
     systemctl start eth-bridge-pru-serial485.service
     sleep 5
 

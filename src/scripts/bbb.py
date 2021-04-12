@@ -6,15 +6,15 @@ import shutil
 import subprocess
 import time
 import json
+import traceback
 
 import ast
 import ipaddress
 import copy
 
 from logger import get_logger
-
+last_log_time = 0
 # from entities import Command, Node, Sector, Type, NodeState
-
 
 class BBB:
     """
@@ -28,10 +28,12 @@ class BBB:
         Creates a new object instance.
         :param path: the configuration file's location
         """
+
         # Creates the objects that wrap the host's settings.
         self.node = Node()
 
         self.logger = get_logger("BBB")
+        self.logger.debug(traceback.extract_stack()[-2])
 
         #  Parameters that define absolute locations inside the host
         self.configuration_file_path = path
@@ -138,7 +140,10 @@ class BBB:
         with open(self.configuration_file_path, "rb") as file:
             self.node = pickle.load(file)
             file.close()
-            self.logger.info("Node configuration file read successfully.")
+            self.logger.info("{}, {}".format(last_log_time, time.time()))
+            if time.time() - last_log_time > 120:
+                self.logger.info("Node configuration file read successfully.")
+                self.last_log = time.time()
 
     def write_node_configuration(self):
         """
@@ -147,7 +152,9 @@ class BBB:
         with open(self.configuration_file_path, "wb") as file:
             file.write(pickle.dumps(self.node))
             file.close()
-            self.logger.info("Node configuration file updated successfully.")
+            if time.time() - last_log_time > 120:
+                self.logger.info("Node configuration file updated successfully.")
+                self.last_log = time.time()
 
     def get_network_specs(self):
         nameservers = "0.0.0.0"

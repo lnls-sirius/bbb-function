@@ -9,12 +9,9 @@ import time
 from xlrd import open_workbook
 from consts import *
 from bbb import BBB
+from logger import get_logger
 
-
-logging.basicConfig(
-    level=logging.INFO, format="[%(levelname)s] %(asctime)-15s %(message)s", datefmt="%d/%m/%Y %H:%M:%S"
-)
-logger = logging.getLogger("AutoConfig")
+logger = get_logger("AutoConfig")
 
 
 # AUTOCONFIG: RTS and CTS pins tied together (jumper)
@@ -54,6 +51,7 @@ if __name__ == "__main__":
 
         # Get device.json from whoami.py and get identified equipment
         mybbb = BBB()
+        logger.info("INITIALIZED YET ANOTHER BBB OBJECT")
         mybbb.type = Device_Type[mybbb.node.type.code]
         mybbb.ids = [int(s) for s in re.findall(r"\d+", mybbb.node.details.split("\t")[0])]
         mybbb.currentIP = str(mybbb.get_network_specs()[1])

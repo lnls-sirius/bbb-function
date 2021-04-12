@@ -12,7 +12,9 @@ def get_logger(name):
     file_handler = RotatingFileHandler("/var/log/bbbfunction.log", maxBytes=15000000, backupCount=5)
     file_handler.setFormatter(formatter)
 
-    logger.addHandler(file_handler)
+    if not logger.hasHandlers():
+        logger.addHandler(file_handler)
+
     logger.setLevel(logging.INFO)
 
     return logger

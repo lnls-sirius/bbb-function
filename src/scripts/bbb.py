@@ -13,7 +13,7 @@ import ipaddress
 import copy
 
 from logger import get_logger
-last_log_time = 0
+
 # from entities import Command, Node, Sector, Type, NodeState
 
 class BBB:
@@ -140,10 +140,9 @@ class BBB:
         with open(self.configuration_file_path, "rb") as file:
             self.node = pickle.load(file)
             file.close()
-            self.logger.info("{}, {}".format(last_log_time, time.time()))
-            if time.time() - last_log_time > 120:
-                self.logger.info("Node configuration file read successfully.")
-                self.last_log = time.time()
+
+            self.logger.info("Node configuration file read successfully.")
+            self.last_log = time.time()
 
     def write_node_configuration(self):
         """
@@ -152,9 +151,9 @@ class BBB:
         with open(self.configuration_file_path, "wb") as file:
             file.write(pickle.dumps(self.node))
             file.close()
-            if time.time() - last_log_time > 120:
-                self.logger.info("Node configuration file updated successfully.")
-                self.last_log = time.time()
+
+            self.logger.info("Node configuration file updated successfully.")
+            self.last_log = time.time()
 
     def get_network_specs(self):
         nameservers = "0.0.0.0"

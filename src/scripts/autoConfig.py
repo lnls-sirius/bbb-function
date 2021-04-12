@@ -51,7 +51,7 @@ if __name__ == "__main__":
 
         # Get device.json from whoami.py and get identified equipment
         mybbb = BBB()
-        logger.info("INITIALIZED YET ANOTHER BBB OBJECT")
+
         mybbb.type = Device_Type[mybbb.node.type.code]
         mybbb.ids = [int(s) for s in re.findall(r"\d+", mybbb.node.details.split("\t")[0])]
         mybbb.currentIP = str(mybbb.get_network_specs()[1])

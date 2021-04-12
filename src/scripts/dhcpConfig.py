@@ -52,7 +52,7 @@ def led():
 
 
 if __name__ == "__main__":
-    logger.info("Verificando condicao DHCP em Hardware")
+    logger.info("Verifying DHCP hardware condition...")
 
     device_addr = PRUserial485_address()
 
@@ -67,12 +67,12 @@ if __name__ == "__main__":
                 AUTOCONFIG = False
                 sleep(2)
     else:
-        logger.info("Subnet not yet configured!")
+        logger.warn("Subnet not yet configured!")
         AUTOCONFIG = False
 
     # CONTADORA
     if device_addr == 0:
-        logger.info("Contadora detectada")
+        logger.info("Counter (contadora) detected")
 
         for en_FF in ["P8_43", "P8_44", "P8_45", "P8_46", "P9_29", "P9_31"]:  # Enable Flip-Flops
             sleep(0.05)
@@ -88,7 +88,7 @@ if __name__ == "__main__":
             state += str(GPIO.input(pin))
 
         if state == "101010":
-            logger.info("Configurando DHCP")
+            logger.info("Configuring DHCP")
             dhcp()
             led()
 

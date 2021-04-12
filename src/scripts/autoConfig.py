@@ -109,13 +109,13 @@ if __name__ == "__main__":
                     if mybeagle_config[BBB_IP_COLUMN] == mybbb.currentIP:
                         logger.info("BBB IP is already configured to {}.".format(mybeagle_config[BBB_IP_COLUMN]))
                     else:
-                        logger.info(
+                        logger.error(
                             "Desired IP {} is currently in use by another device.".format(
                                 mybeagle_config[BBB_IP_COLUMN]
                             )
                         )
                 else:
-                    logger.info(
+                    logger.error(
                         "Cannot change to IP {}, subnet is not compatible to current one ({}).".format(
                             mybeagle_config[BBB_IP_COLUMN], mybbb.currentSubnet
                         )
@@ -123,7 +123,7 @@ if __name__ == "__main__":
 
         # If BBB not found, keep DHCP and raise a flag!
         else:
-            logger.info(
+            logger.error(
                 "A compatible device was NOT found in spreadsheet. Verify if there is a config file at {}.".format(
                     CONFIG_FILE
                 )
@@ -153,11 +153,11 @@ if __name__ == "__main__":
                     )
                 else:
                     if not IP_AVAILABLE:
-                        logger.info(
+                        logger.error(
                             "Desired IP {} is currently in use by another device.".format(file_config[BBB_IP_COLUMN])
                         )
                     else:
-                        logger.info(
+                        logger.error(
                             "Cannot change to IP {}, subnet is not compatible to current one ({}).".format(
                                 file_config[BBB_IP_COLUMN], mybbb.currentSubnet
                             )

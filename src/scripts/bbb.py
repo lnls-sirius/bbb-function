@@ -84,7 +84,7 @@ class BBB:
         """
         Reboots this node.
         """
-        self.logger.info("Setting state to reboot ... Waiting for the next ping ...")
+        self.logger.info("Setting state to reboot... Waiting for the next ping...")
         time.sleep(3.0)
         self.logger.info("Rebooting system.")
         os.system("reboot")
@@ -128,7 +128,7 @@ class BBB:
         try:
             self.read_node_configuration()
         except IOError:
-            self.logger.error("Configuration file not found. Adopting default values.")
+            self.logger.warn("Configuration file not found. Adopting default values.")
 
         name = subprocess.check_output(["hostname"]).decode("utf-8").strip("\n")
         self.node.name = name.replace("--", ":")

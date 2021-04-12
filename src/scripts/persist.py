@@ -33,7 +33,7 @@ def persist_info(device, baud, exit_code, details="No details."):
         "time": str(datetime.now()),
     }
 
-    logger.info("Device Identified !")
+    logger.info("Device Identified!")
     write_info(DEVICE_JSON, json.dumps(device_info))
     exit(0)
 

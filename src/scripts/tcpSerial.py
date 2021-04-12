@@ -66,7 +66,7 @@ if __name__ == "__main__":
             s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
             s.bind(("0.0.0.0", args.port))
             s.listen()
-            logger.info("Listening ...")
+            logger.info("Listening...")
             conn, addr = s.accept()
             conn.settimeout(10)
             try:
@@ -76,7 +76,7 @@ if __name__ == "__main__":
                         data = conn.recv(args.tcp_buffer)
 
                         if not data:
-                            logger.info("No data from ioc ...")
+                            logger.warn("No data from IOC...")
                             break
 
                         ser.reset_input_buffer()
@@ -92,6 +92,6 @@ if __name__ == "__main__":
                         conn.sendall(res)
                         logger.debug("In=%s     Out=%s     len=%s" % (data, res, len(res)))
             except ConnectionError:
-                logger.exception("Connection Error !")
+                logger.exception("Connection Error!")
             except socket.timeout:
                 logger.exception("TCP Timeout")

@@ -169,10 +169,9 @@ function startup_HardReset {
 
 function spixconv {
     echo SPIXCONV detected.
-    echo Synchronizing pru-serial485 and spixconv files
-    pushd ${FUNCTION_BASE}/src/scripts/
-        ./rsync_beaglebone.sh spixconv
-    popd
+#    echo Synchronizing SPIxCONV files
+#    rsync_SPIxCONV
+
     overlay_PRUserial485
     overlay_SPIxCONV
 
@@ -190,6 +189,7 @@ function pru_power_supply {
     popd
 
     echo "Running eth-bridge-pru-serial485 on ports 5000 and 6000"
+    sleep 5
     systemctl start eth-bridge-pru-serial485.service
     sleep 5
 
@@ -216,17 +216,17 @@ function mks {
 
 function uhv {
     overlay_PRUserial485
-    socat TCP-LISTEN:5004,reuseaddr,fork,nodelay,range=${SERVER_IP_ADDR} FILE:${SOCAT_DEVICE},b${BAUDRATE}
+    socat TCP-LISTEN:5004,reuseaddr,fork,nodelay FILE:${SOCAT_DEVICE},b${BAUDRATE}
 }
 
 function mbtemp {
     overlay_PRUserial485
     echo  "Starting socat..."
-    socat TCP-LISTEN:5003,reuseaddr,fork,nodelay,range=${SERVER_IP_ADDR} FILE:${SOCAT_DEVICE},b${BAUDRATE}
+    socat TCP-LISTEN:5003,reuseaddr,fork,nodelay FILE:${SOCAT_DEVICE},b${BAUDRATE}
 }
 
 function socat_devices {
     overlay_PRUserial485
     echo  "Starting socat..."
-    socat TCP-LISTEN:${SOCAT_PORT},reuseaddr,fork,nodelay,range=${SERVER_IP_ADDR} FILE:${SOCAT_DEVICE},b${BAUDRATE},rawer
+    socat TCP-LISTEN:${SOCAT_PORT},reuseaddr,fork,nodelay FILE:${SOCAT_DEVICE},b${BAUDRATE},rawer
 }

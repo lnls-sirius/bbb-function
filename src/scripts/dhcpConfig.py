@@ -53,7 +53,6 @@ if __name__ == '__main__':
     GPIO.setup(LED_PIN, GPIO.OUT)    
     GPIO.output(LED_PIN, GPIO.LOW)
 
-
     # ----------------------------------
     # AutoConfig Status
     # ----------------------------------

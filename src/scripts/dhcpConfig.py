@@ -9,6 +9,7 @@ import logging
 import Adafruit_BBIO.GPIO as GPIO
 from PRUserial485 import PRUserial485_address
 from counters_addr import Addressing
+from AutoConfig import AutoConfig
 
 
 logging.basicConfig(level=logging.INFO, format='[%(levelname)s] %(asctime)-15s %(message)s',
@@ -18,17 +19,10 @@ logger = logging.getLogger('key_dhcp')
 
 LED_PIN = "P8_28"
 
-counter = Addressing()
+COUNTINGPRU_ADDRESS = 0
+SERIALXXCON_ADDRESS = 21
 
-for i in range(5):
-    try:
-        AUTOCONFIG = serial.Serial("/dev/ttyUSB0").cts
-    except:
-        system("/root/counting-pru/src/DTO_CountingPRU.sh")
-        AUTOCONFIG = counter.autoConfig_Available()
-        sleep(2)
-    if AUTOCONFIG:
-        break
+        
 
 def dhcp():
     '''
@@ -43,6 +37,7 @@ def dhcp():
 def led():		
     '''
     Shows the user that the IP has been configured
+    TODO: BLINK ACCORDING TO NEW IP ADDRESS !
     '''
     for i in range(40):
         GPIO.output(LED_PIN, not(GPIO.input(LED_PIN)))
@@ -52,35 +47,55 @@ def led():
 if __name__ == '__main__':
     logger.info("Verificando condicao DHCP em Hardware")
 
-    device_addr = PRUserial485_address()
-
-    GPIO.setup(LED_PIN, GPIO.OUT)    #Led configuration
+    # ----------------------------------
+    # Led configuration
+    # ----------------------------------
+    GPIO.setup(LED_PIN, GPIO.OUT)    
     GPIO.output(LED_PIN, GPIO.LOW)
 
-    # CONTADORA
-    if device_addr == 0:
+
+    '''
+    # ----------------------------------
+    # Check whether AUTOCONFIG is enabled
+    # ----------------------------------
+    # COUNTINGPRU
+    if(PRUserial485_address() == COUNTINGPRU_ADDRESS):
+        counter = Addressing()
+        system("/root/counting-pru/src/DTO_CountingPRU.sh")
+        for i in range(5):
+            AUTOCONFIG = counter.autoConfig_Available()
+            if AUTOCONFIG:
+                break
+            sleep(2)
+    # SERIALxxCON   
+    elif(PRUserial485_address() == SERIALXXCON_ADDRESS):
+        for i in range(5):
+            try:
+                AUTOCONFIG = serial.Serial("/dev/ttyUSB0").cts
+                if AUTOCONFIG:
+                    break
+            except:
+                AUTOCONFIG = False
+                sleep(2)
+    '''
+
+    AUTOCONFIG = AutoConfig().status
+    print(AUTOCONFIG)
+
+
+    # ----------------------------------
+    # Apply DHCP config if needed
+    # ----------------------------------
+    # COUNTINGPRU
+    if(PRUserial485_address() == COUNTINGPRU_ADDRESS):
         logger.info("Contadora detectada")
 
-        for en_FF in ["P8_43", "P8_44", "P8_45", "P8_46", "P9_29", "P9_31"]: #Enable Flip-Flops
-            sleep(0.05)
-            GPIO.setup(en_FF, GPIO.OUT)
-            sleep(0.05)
-            GPIO.output(en_FF, GPIO.HIGH)
-
-        sleep(1) #Sleep until FF set its output, frequency of input oscillator must be higher than 1 Hz
-        state = ''
-        for pin in ["P8_39", "P8_40", "P8_41", "P8_42", "P9_28", "P9_30"]:
-            GPIO.setup(pin, GPIO.IN)
-            sleep(0.05)
-            state += str(GPIO.input(pin))
-
-        if (state == '101010') or AUTOCONFIG:
+        if AUTOCONFIG:
             logger.info("Configurando DHCP")
             dhcp()
             led()
-
     # SERIALxxCON        
-    else:
+    elif(PRUserial485_address() == SERIALXXCON_ADDRESS):
         for pin in ["P8_11", "P8_12"]:
             GPIO.setup(pin, GPIO.IN)
         #Check if the keys are set to the DHCP position

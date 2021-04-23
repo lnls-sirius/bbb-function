@@ -10,24 +10,51 @@ from xlrd import open_workbook
 from consts import *
 from bbb import BBB
 from counters_addr import Addressing
+from PRUserial485 import PRUserial485_address
+
 
 logging.basicConfig(level=logging.INFO,
                     format='[%(levelname)s] %(asctime)-15s %(message)s',
                     datefmt='%d/%m/%Y %H:%M:%S')
 logger = logging.getLogger('AutoConfig')
-counters = Addressing()
+
+# Constants
+COUNTINGPRU_ADDRESS = 0
+SERIALXXCON_ADDRESS = 21
 
 
-# AUTOCONFIG: RTS and CTS pins tied together (jumper)
-for i in range(5):
-    try:
-        AUTOCONFIG = serial.Serial("/dev/ttyUSB0").cts
-        
-    except: 
-        AUTOCONFIG = counters.autoConfig_Available()
-        time.sleep(2)
-    if AUTOCONFIG:
-        break
+class AutoConfig():
+    def __init__(self):
+        self.address = PRUserial485_address()
+        self.status = self.check()
+
+
+    def check(self):
+    '''
+    Check whether AUTOCONFIG is enabled
+    '''
+    # COUNTINGPRU
+    if(self.address == COUNTINGPRU_ADDRESS):
+        self.counter = Addressing()
+        system("/root/counting-pru/src/DTO_CountingPRU.sh")
+        for i in range(5):
+            self.status = self.counter.autoConfig_Available()
+            if self.status:
+                return True
+            sleep(2)
+        return False
+    # SERIALxxCON - AUTOCONFIG: RTS and CTS pins tied together (jumper)   
+    elif(self.address == SERIALXXCON_ADDRESS):
+        for i in range(5):
+            try:
+                self.status = serial.Serial("/dev/ttyUSB0").cts
+                if self.status:
+                    return True
+            except:
+                self.status = False
+                sleep(2)
+        return False
+
 
         
 class GetData():
@@ -51,6 +78,8 @@ class GetData():
             self.data = {}
 
 if __name__ == '__main__':
+
+    AUTOCONFIG = AutoConfig()
 
     if(AUTOCONFIG):
         mybeagle_config = ''
@@ -137,5 +166,3 @@ if __name__ == '__main__':
                 
             except:
                 logger.info("BBB configuration not found ! Keeping DHCP")
-        
-

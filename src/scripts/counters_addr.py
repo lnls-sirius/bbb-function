@@ -65,4 +65,3 @@ class Addressing:
 
 if __name__ == "__main__":
     count = Addressing()
-    print("Address: {}\nAutoConfig:{}".format(count.addr(), count.autoConfig_Available()))

@@ -33,27 +33,27 @@ class AutoConfig():
     '''
     Check whether AUTOCONFIG is enabled
     '''
-    # COUNTINGPRU
-    if(self.address == COUNTINGPRU_ADDRESS):
-        self.counter = Addressing()
-        system("/root/counting-pru/src/DTO_CountingPRU.sh")
-        for i in range(5):
-            self.status = self.counter.autoConfig_Available()
-            if self.status:
-                return True
-            sleep(2)
-        return False
-    # SERIALxxCON - AUTOCONFIG: RTS and CTS pins tied together (jumper)   
-    elif(self.address == SERIALXXCON_ADDRESS):
-        for i in range(5):
-            try:
-                self.status = serial.Serial("/dev/ttyUSB0").cts
+        # COUNTINGPRU
+        if(self.address == COUNTINGPRU_ADDRESS):
+            self.counter = Addressing()
+            system("/root/counting-pru/src/DTO_CountingPRU.sh")
+            for i in range(5):
+                self.status = self.counter.autoConfig_Available()
                 if self.status:
                     return True
-            except:
-                self.status = False
                 sleep(2)
-        return False
+            return False
+        # SERIALxxCON - AUTOCONFIG: RTS and CTS pins tied together (jumper)   
+        elif(self.address == SERIALXXCON_ADDRESS):
+            for i in range(5):
+                try:
+                    self.status = serial.Serial("/dev/ttyUSB0").cts
+                    if self.status:
+                        return True
+                except:
+                    self.status = False
+                    sleep(2)
+            return False
 
 
         

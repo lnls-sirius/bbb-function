@@ -9,7 +9,7 @@ import logging
 import Adafruit_BBIO.GPIO as GPIO
 from PRUserial485 import PRUserial485_address
 from counters_addr import Addressing
-from AutoConfig import AutoConfig
+from autoConfig import AutoConfig
 
 
 logging.basicConfig(level=logging.INFO, format='[%(levelname)s] %(asctime)-15s %(message)s',
@@ -80,7 +80,7 @@ if __name__ == '__main__':
     '''
 
     AUTOCONFIG = AutoConfig().status
-    print(AUTOCONFIG)
+    logger.info(AUTOCONFIG)
 
 
     # ----------------------------------

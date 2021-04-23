@@ -30,9 +30,9 @@ class AutoConfig():
 
 
     def check(self):
-    '''
-    Check whether AUTOCONFIG is enabled
-    '''
+        '''
+        Check whether AUTOCONFIG is enabled
+        '''
         # COUNTINGPRU
         if(self.address == COUNTINGPRU_ADDRESS):
             self.counter = Addressing()

@@ -43,7 +43,7 @@ class AutoConfig():
                 for i in range(5):
                     self.status = self.counter.autoConfig_Available()
                     if self.status:
-                        self.status = True
+                        break
                     sleep(2)
 
             # SERIALxxCON - AUTOCONFIG: RTS and CTS pins tied together (jumper)   
@@ -51,12 +51,9 @@ class AutoConfig():
                 for i in range(5):
                     try:
                         self.status = serial.Serial("/dev/ttyUSB0").cts
-                        if self.status:
-                            self.status = True
                     except:
                         self.status = False
                         sleep(2)
-                self.status = False
 
         # Subnet not configured, then:
         else:

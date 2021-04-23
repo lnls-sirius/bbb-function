@@ -5,6 +5,7 @@ import serial
 import subprocess
 import json
 import re
+import socket
 import time
 from xlrd import open_workbook
 from consts import *
@@ -21,38 +22,57 @@ logger = logging.getLogger('AutoConfig')
 # Constants
 COUNTINGPRU_ID = 0
 SERIALXXCON_ID = 21
+CONFIGURED_SUBNETS = ['102','103','104','105']
 
 
 class AutoConfig():
     def __init__(self):
         self.boardID = PRUserial485_address()
-        self.status = self.check()
+        self.status = False
+        self.check()
 
     def check(self):
         '''
-        Check whether AUTOCONFIG is enabled
+        Check whether AUTOCONFIG is enabled only for some subnets
         '''
-        # COUNTINGPRU
-        if(self.boardID == COUNTINGPRU_ID):
-            self.counter = Addressing()
-            system("/root/counting-pru/src/DTO_CountingPRU.sh")
-            for i in range(5):
-                self.status = self.counter.autoConfig_Available()
-                if self.status:
-                    return True
-                sleep(2)
-            return False
-        # SERIALxxCON - AUTOCONFIG: RTS and CTS pins tied together (jumper)   
-        elif(self.boardID == SERIALXXCON_ID):
-            for i in range(5):
-                try:
-                    self.status = serial.Serial("/dev/ttyUSB0").cts
+        if(self.get_subnet() in CONFIGURED_SUBNETS):
+            # COUNTINGPRU
+            if(self.boardID == COUNTINGPRU_ID):
+                self.counter = Addressing()
+                system("/root/counting-pru/src/DTO_CountingPRU.sh")
+                for i in range(5):
+                    self.status = self.counter.autoConfig_Available()
                     if self.status:
-                        return True
-                except:
-                    self.status = False
+                        self.status = True
                     sleep(2)
-            return False
+
+            # SERIALxxCON - AUTOCONFIG: RTS and CTS pins tied together (jumper)   
+            elif(self.boardID == SERIALXXCON_ID):
+                for i in range(5):
+                    try:
+                        self.status = serial.Serial("/dev/ttyUSB0").cts
+                        if self.status:
+                            self.status = True
+                    except:
+                        self.status = False
+                        sleep(2)
+                self.status = False
+
+        # Subnet not configured, then:
+        else:
+            self.status = False
+
+    def get_subnet(self):
+        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        try:
+            # doesn't have to be reachable
+            s.connect(('10.128.101.100', 1))
+            IP = s.getsockname()[0]
+        except Exception:
+            IP = '127.0.0.1'
+        finally:
+            s.close()
+        return IP.split('.')[2]
 
 
         

@@ -45,7 +45,7 @@ def led():
 
 
 if __name__ == '__main__':
-    logger.info("Verificando condicao DHCP em Hardware")
+    logger.info("Verifying AUTOCONFIG/DHCP configuring in hardware...")
 
     # ----------------------------------
     # Led configuration
@@ -54,46 +54,22 @@ if __name__ == '__main__':
     GPIO.output(LED_PIN, GPIO.LOW)
 
 
-    '''
     # ----------------------------------
-    # Check whether AUTOCONFIG is enabled
+    # AutoConfig Status
     # ----------------------------------
-    # COUNTINGPRU
-    if(PRUserial485_address() == COUNTINGPRU_ADDRESS):
-        counter = Addressing()
-        system("/root/counting-pru/src/DTO_CountingPRU.sh")
-        for i in range(5):
-            AUTOCONFIG = counter.autoConfig_Available()
-            if AUTOCONFIG:
-                break
-            sleep(2)
-    # SERIALxxCON   
-    elif(PRUserial485_address() == SERIALXXCON_ADDRESS):
-        for i in range(5):
-            try:
-                AUTOCONFIG = serial.Serial("/dev/ttyUSB0").cts
-                if AUTOCONFIG:
-                    break
-            except:
-                AUTOCONFIG = False
-                sleep(2)
-    '''
-
     AUTOCONFIG = AutoConfig().status
-    logger.info(AUTOCONFIG)
-
+    
 
     # ----------------------------------
     # Apply DHCP config if needed
     # ----------------------------------
     # COUNTINGPRU
     if(PRUserial485_address() == COUNTINGPRU_ADDRESS):
-        logger.info("Contadora detectada")
-
         if AUTOCONFIG:
-            logger.info("Configurando DHCP")
+            logger.info("AUTOCONFIG enabled. Configuring DHCP.")
             dhcp()
             led()
+
     # SERIALxxCON        
     elif(PRUserial485_address() == SERIALXXCON_ADDRESS):
         for pin in ["P8_11", "P8_12"]:
@@ -102,6 +78,12 @@ if __name__ == '__main__':
         DHCPmode_switches = (GPIO.input("P8_11") == 1 and GPIO.input("P8_12") == 0)
                                                                                                                 
         if (AUTOCONFIG or DHCPmode_switches):
-            logger.info("AUTOCONFIG enabled. Configuring DHCP")
+            if(AUTOCONFIG):
+                logger.info("AUTOCONFIG enabled. Configuring DHCP.")
+            elif(DHCPmode_switches):
+                logger.info("SERIALxxCON red switches on DHCP position. Configuring DHCP.")
             dhcp()
             led()
+
+    if(not (AUTOCONFIG)):
+        logger.info("AUTOCONFIG disabled.")

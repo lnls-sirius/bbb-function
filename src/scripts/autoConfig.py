@@ -19,22 +19,21 @@ logging.basicConfig(level=logging.INFO,
 logger = logging.getLogger('AutoConfig')
 
 # Constants
-COUNTINGPRU_ADDRESS = 0
-SERIALXXCON_ADDRESS = 21
+COUNTINGPRU_ID = 0
+SERIALXXCON_ID = 21
 
 
 class AutoConfig():
     def __init__(self):
-        self.address = PRUserial485_address()
+        self.boardID = PRUserial485_address()
         self.status = self.check()
-
 
     def check(self):
         '''
         Check whether AUTOCONFIG is enabled
         '''
         # COUNTINGPRU
-        if(self.address == COUNTINGPRU_ADDRESS):
+        if(self.boardID == COUNTINGPRU_ID):
             self.counter = Addressing()
             system("/root/counting-pru/src/DTO_CountingPRU.sh")
             for i in range(5):
@@ -44,7 +43,7 @@ class AutoConfig():
                 sleep(2)
             return False
         # SERIALxxCON - AUTOCONFIG: RTS and CTS pins tied together (jumper)   
-        elif(self.address == SERIALXXCON_ADDRESS):
+        elif(self.boardID == SERIALXXCON_ID):
             for i in range(5):
                 try:
                     self.status = serial.Serial("/dev/ttyUSB0").cts
@@ -79,7 +78,7 @@ class GetData():
 
 if __name__ == '__main__':
 
-    AUTOCONFIG = AutoConfig()
+    AUTOCONFIG = AutoConfig().status
 
     if(AUTOCONFIG):
         mybeagle_config = ''
@@ -166,3 +165,4 @@ if __name__ == '__main__':
                 
             except:
                 logger.info("BBB configuration not found ! Keeping DHCP")
+                

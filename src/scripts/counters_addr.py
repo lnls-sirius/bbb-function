@@ -33,7 +33,7 @@ class Addressing:
         counting = sum(Counting(1)[6:])
         Close()
 
-        status = abs(counting - 488) < 50
+        status = abs(counting - self.clk_default/2**10) < 50
 
         for channel in [self.CH1, self.CH3]:
             GPIO.output(channel, GPIO.LOW)
@@ -54,7 +54,7 @@ class Addressing:
             self.logger.warning("It is not avaiable addressing by hardware")
             return(None)
 
-        elif abs(counting - 1953) < 50:
+        elif abs(counting - self.clk_default/2**8) < 50:
             addr = 7
 
         else:
@@ -65,3 +65,4 @@ class Addressing:
 
 if __name__ == "__main__":
     count = Addressing()
+    print("Address: {}\nAuto Config: {}\n".format(count.addr(), count.autoConfig_Available())

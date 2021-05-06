@@ -116,7 +116,7 @@ def thermo_probe():
     Thermo probes
     """
     logger.debug('Thermo probes')
-    if GPIO.input(PIN_FTDI_PRU) == FTDI and GPIO.input(PIN_RS232_RS485) == RS485 and PRUserial485_address() == 21:
+    if GPIO.input(PIN_FTDI_PRU) == FTDI and GPIO.input(PIN_RS232_RS485) == RS485 and PRUserial485_address() == 21 and os.path.isfile(PORT):
         baud = 19200
         ser = Serial(port=PORT,
                      baudrate=baud,
@@ -158,7 +158,7 @@ def mbtemp():
     MBTemp
     """
     logger.debug('MBTemp')
-    if GPIO.input(PIN_FTDI_PRU) == FTDI and GPIO.input(PIN_RS232_RS485) == RS485 and PRUserial485_address() == 21:
+    if GPIO.input(PIN_FTDI_PRU) == FTDI and GPIO.input(PIN_RS232_RS485) == RS485 and PRUserial485_address() == 21 and os.path.isfile(PORT):
         baud = 115200
         ser = Serial(PORT, baud, timeout=TIMEOUT)
         devices = []
@@ -177,7 +177,7 @@ def mks9376b():
     MKS 937B
     """
     logger.debug('MKS 937B')
-    if GPIO.input(PIN_FTDI_PRU) == FTDI and GPIO.input(PIN_RS232_RS485) == RS485 and PRUserial485_address() == 21:
+    if GPIO.input(PIN_FTDI_PRU) == FTDI and GPIO.input(PIN_RS232_RS485) == RS485 and PRUserial485_address() == 21 and os.path.isfile(PORT):
         baud = 115200
         ser = Serial(port=PORT, baudrate=baud, timeout=0.05)
         devices = []
@@ -212,7 +212,7 @@ def agilent4uhv():
     AGILENT 4UHV
     """
     logger.debug('AGILENT 4UHV')
-    if GPIO.input(PIN_FTDI_PRU) == FTDI and GPIO.input(PIN_RS232_RS485) == RS485 and PRUserial485_address() == 21:
+    if GPIO.input(PIN_FTDI_PRU) == FTDI and GPIO.input(PIN_RS232_RS485) == RS485 and PRUserial485_address() == 21 and os.path.isfile(PORT):
         baud = 38400
         ser = Serial(port=PORT, baudrate=baud, timeout=.6)
         devices = []

@@ -1,6 +1,5 @@
 #!/usr/bin/python
 import json
-import logging
 from datetime import datetime
 from consts import RES_FILE, BAUDRATE_FILE, DEVICE_JSON
 from logger import get_logger

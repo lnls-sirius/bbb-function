@@ -4,17 +4,13 @@ import logging
 import time
 import argparse
 
-from sys import argv
-from serial import Serial
-from os import environ, path, remove
-from persist import persist_info
+from os import path, remove
 
 from consts import *
 
 from devices import (
     mbtemp,
     counting_pru,
-    no_tty,
     power_supply_pru,
     thermo_probe,
     mks9376b,

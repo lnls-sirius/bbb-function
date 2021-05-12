@@ -3,8 +3,6 @@ import argparse
 import logging
 import socket
 import logging.handlers
-import struct
-import select
 import time
 
 from serial import Serial

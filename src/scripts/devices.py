@@ -10,7 +10,6 @@ from PRUserial485 import (
     PRUserial485_open,
     PRUserial485_write,
     PRUserial485_read,
-    PRUserial485_close,
     PRUserial485_address,
 )
 from serial import Serial, STOPBITS_TWO, SEVENBITS, PARITY_EVEN
@@ -28,7 +27,6 @@ SPIxCONV = False
 
 if os.path.exists("/root/SPIxCONV/software/scripts"):
     sys.path.append("/root/SPIxCONV/software/scripts")
-    import init
     import flash
     import selection
 
@@ -54,6 +52,7 @@ logger = logging.getLogger("Whoami")
 
 counters = Addressing()
 
+
 def reset():
     """
     Reset device.json content.
@@ -68,7 +67,12 @@ def counting_pru():
     logger.debug("Counting PRU")
     if PRUserial485_address() != 21 and not os.path.isfile(PORT):
         os.system("/root/counting-pru/src/DTO_CountingPRU.sh")
-        persist_info(Type.COUNTING_PRU, 0, COUNTING_PRU, 'Connected: [{}]. Auto Configuration: {}'.format(counters.addr(), counters.autoConfig_Available()))
+        persist_info(
+            Type.COUNTING_PRU,
+            0,
+            COUNTING_PRU,
+            "Connected: [{}]. Auto Configuration: {}".format(counters.addr(), counters.autoConfig_Available()),
+        )
 
 
 def no_tty():
@@ -140,8 +144,13 @@ def thermo_probe():
     """
     Thermo probes
     """
-    logger.debug('Thermo probes')
-    if GPIO.input(PIN_FTDI_PRU) == FTDI and GPIO.input(PIN_RS232_RS485) == RS485 and PRUserial485_address() == 21 and os.path.isfile(PORT):
+    logger.debug("Thermo probes")
+    if (
+        GPIO.input(PIN_FTDI_PRU) == FTDI
+        and GPIO.input(PIN_RS232_RS485) == RS485
+        and PRUserial485_address() == 21
+        and os.path.isfile(PORT)
+    ):
         baud = 19200
         ser = Serial(
             port=PORT, baudrate=baud, bytesize=SEVENBITS, parity=PARITY_EVEN, stopbits=STOPBITS_TWO, timeout=TIMEOUT
@@ -162,8 +171,8 @@ def BSMPChecksum(string):
     while i < len(string):
         counter += ord(string[i])
         i += 1
-    counter = counter & 0xff
-    counter = (256 - counter) & 0xff
+    counter = counter & 0xFF
+    counter = (256 - counter) & 0xFF
     return string + chr(counter)
 
 
@@ -182,8 +191,13 @@ def mbtemp():
     """
     MBTemp
     """
-    logger.debug('MBTemp')
-    if GPIO.input(PIN_FTDI_PRU) == FTDI and GPIO.input(PIN_RS232_RS485) == RS485 and PRUserial485_address() == 21 and os.path.isfile(PORT):
+    logger.debug("MBTemp")
+    if (
+        GPIO.input(PIN_FTDI_PRU) == FTDI
+        and GPIO.input(PIN_RS232_RS485) == RS485
+        and PRUserial485_address() == 21
+        and os.path.isfile(PORT)
+    ):
         baud = 115200
         ser = Serial(PORT, baud, timeout=TIMEOUT)
         devices = []
@@ -201,8 +215,13 @@ def mks9376b():
     """
     MKS 937B
     """
-    logger.debug('MKS 937B')
-    if GPIO.input(PIN_FTDI_PRU) == FTDI and GPIO.input(PIN_RS232_RS485) == RS485 and PRUserial485_address() == 21 and os.path.isfile(PORT):
+    logger.debug("MKS 937B")
+    if (
+        GPIO.input(PIN_FTDI_PRU) == FTDI
+        and GPIO.input(PIN_RS232_RS485) == RS485
+        and PRUserial485_address() == 21
+        and os.path.isfile(PORT)
+    ):
         baud = 115200
         ser = Serial(port=PORT, baudrate=baud, timeout=0.05)
         devices = []
@@ -236,8 +255,13 @@ def agilent4uhv():
     """
     AGILENT 4UHV
     """
-    logger.debug('AGILENT 4UHV')
-    if GPIO.input(PIN_FTDI_PRU) == FTDI and GPIO.input(PIN_RS232_RS485) == RS485 and PRUserial485_address() == 21 and os.path.isfile(PORT):
+    logger.debug("AGILENT 4UHV")
+    if (
+        GPIO.input(PIN_FTDI_PRU) == FTDI
+        and GPIO.input(PIN_RS232_RS485) == RS485
+        and PRUserial485_address() == 21
+        and os.path.isfile(PORT)
+    ):
         baud = 38400
         ser = Serial(port=PORT, baudrate=baud, timeout=0.6)
         devices = []
@@ -283,14 +307,10 @@ def spixconv():
         if flash.ID_read(addr) == 4:
             spi_addr = 8 if flash.address_read(addr) == 0 else flash.address_read(addr)
             logger.info(
-                "{}".format(
-                    "Addr code",
+                "Addr code: {}\nSelection Board ID: {}\nFlash address: {}\nSPI address: {}".format(
                     addr,
-                    "Selection Board ID",
                     selection.board_ID(addr),
-                    "Flash address",
                     flash.address_read(addr),
-                    "SPI Addr",
                     spi_addr,
                 )
             )

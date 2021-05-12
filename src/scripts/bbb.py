@@ -339,12 +339,11 @@ class Sector:
         + ["LTs", "Conectividade", "Fontes", "RF", "Outros"]
     )
 
-    SUBNETS = (
-        [[ipaddress.ip_network("10.128.1.0/24"), ipaddress.ip_network("10.128.255.0/24")]]
-        + [ipaddress.ip_network("10.128.{}.0/24".format(i)) for i in range(101, 124)]
-        + [ipaddress.ip_network("10.128.{}.0/24".format(i)) for i in range(201, 222)]
-        + [ipaddress.ip_network("10.128.{}.0/24".format(i)) for i in range(150, 153)]
-    )
+    SUBNETS = [[ipaddress.ip_network(u'10.128.1.0/24'),
+                ipaddress.ip_network(u'10.128.255.0/24')]] + \
+              [ipaddress.ip_network(u'10.128.{}.0/24'.format(i)) for i in range(101, 125)] + \
+              [ipaddress.ip_network(u'10.128.{}.0/24'.format(i)) for i in range(201, 222)] + \
+              [ipaddress.ip_network(u'10.128.{}.0/24'.format(i)) for i in range(150, 153)]
 
     # SECTORS_LIST = []
     SECTORS_DICT = {}

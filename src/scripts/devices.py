@@ -17,6 +17,7 @@ from serial import Serial, STOPBITS_TWO, SEVENBITS, PARITY_EVEN
 from persist import persist_info
 from consts import *
 from logger import get_logger
+from counters_addr import Addressing
 
 sys.path.append(os.path.join(os.path.dirname(os.path.realpath(__file__)), "../../../"))
 from bbb import Type
@@ -51,6 +52,8 @@ GPIO.setup(PIN_RS232_RS485, GPIO.IN)
 logger = logging.getLogger("Whoami")
 
 
+counters = Addressing()
+
 def reset():
     """
     Reset device.json content.
@@ -64,7 +67,8 @@ def counting_pru():
     """
     logger.debug("Counting PRU")
     if PRUserial485_address() != 21 and not os.path.isfile(PORT):
-        persist_info(Type.COUNTING_PRU, 0, COUNTING_PRU)
+        os.system("/root/counting-pru/src/DTO_CountingPRU.sh")
+        persist_info(Type.COUNTING_PRU, 0, COUNTING_PRU, 'Connected: [{}]. Auto Configuration: {}'.format(counters.addr(), counters.autoConfig_Available()))
 
 
 def no_tty():
@@ -136,8 +140,8 @@ def thermo_probe():
     """
     Thermo probes
     """
-    logger.debug("Thermo probes")
-    if GPIO.input(PIN_FTDI_PRU) == FTDI and GPIO.input(PIN_RS232_RS485) == RS485 and PRUserial485_address() == 21:
+    logger.debug('Thermo probes')
+    if GPIO.input(PIN_FTDI_PRU) == FTDI and GPIO.input(PIN_RS232_RS485) == RS485 and PRUserial485_address() == 21 and os.path.isfile(PORT):
         baud = 19200
         ser = Serial(
             port=PORT, baudrate=baud, bytesize=SEVENBITS, parity=PARITY_EVEN, stopbits=STOPBITS_TWO, timeout=TIMEOUT
@@ -178,8 +182,8 @@ def mbtemp():
     """
     MBTemp
     """
-    logger.debug("MBTemp")
-    if GPIO.input(PIN_FTDI_PRU) == FTDI and GPIO.input(PIN_RS232_RS485) == RS485 and PRUserial485_address() == 21:
+    logger.debug('MBTemp')
+    if GPIO.input(PIN_FTDI_PRU) == FTDI and GPIO.input(PIN_RS232_RS485) == RS485 and PRUserial485_address() == 21 and os.path.isfile(PORT):
         baud = 115200
         ser = Serial(PORT, baud, timeout=TIMEOUT)
         devices = []
@@ -197,8 +201,8 @@ def mks9376b():
     """
     MKS 937B
     """
-    logger.debug("MKS 937B")
-    if GPIO.input(PIN_FTDI_PRU) == FTDI and GPIO.input(PIN_RS232_RS485) == RS485 and PRUserial485_address() == 21:
+    logger.debug('MKS 937B')
+    if GPIO.input(PIN_FTDI_PRU) == FTDI and GPIO.input(PIN_RS232_RS485) == RS485 and PRUserial485_address() == 21 and os.path.isfile(PORT):
         baud = 115200
         ser = Serial(port=PORT, baudrate=baud, timeout=0.05)
         devices = []
@@ -232,8 +236,8 @@ def agilent4uhv():
     """
     AGILENT 4UHV
     """
-    logger.debug("AGILENT 4UHV")
-    if GPIO.input(PIN_FTDI_PRU) == FTDI and GPIO.input(PIN_RS232_RS485) == RS485 and PRUserial485_address() == 21:
+    logger.debug('AGILENT 4UHV')
+    if GPIO.input(PIN_FTDI_PRU) == FTDI and GPIO.input(PIN_RS232_RS485) == RS485 and PRUserial485_address() == 21 and os.path.isfile(PORT):
         baud = 38400
         ser = Serial(port=PORT, baudrate=baud, timeout=0.6)
         devices = []

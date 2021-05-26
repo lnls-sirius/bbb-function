@@ -1,1 +1,2 @@
 *.bak
+src/scripts/__pycache__/*

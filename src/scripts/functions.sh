@@ -1,6 +1,39 @@
 #!/bin/bash
 # -*- coding: utf-8 -*-
 
+
+function bbb_primary_secondary {
+    echo "Checking if primary or secondary BBB"
+    pushd ${FUNCTION_BASE}/src/scripts/
+        ./bbbPrimarySecondary.py
+        export BBB_STATUS=$?
+        if [[ ${BBB_STATUS} = "1" ]]; then
+            export BBB_STATUS="PRIMARY"
+            echo "This BBB has set itself as Primary BBB"
+        elif [[ ${BBB_STATUS} = "2" ]]; then
+            export BBB_STATUS="SECONDARY"
+            echo "There is another BBB commanding. This BBB has set itself as Secondary BBB"
+        fi
+    popd
+}
+
+
+function startup_primaryLoop {
+    echo Starting up primaryLoop
+    pushd ${FUNCTION_BASE}/src/scripts/
+        ./primaryLoop.py
+    popd
+}
+
+
+function startup_secondaryLoop {
+    echo Starting up secondaryLoop
+    pushd ${FUNCTION_BASE}/src/scripts/
+        ./secondaryLoop.py
+    popd
+}
+
+
 function rsync_PRUserial485 {
     pushd ${FUNCTION_BASE}/src/scripts/
         ./rsync_beaglebone.sh pru-serial485
@@ -189,13 +222,12 @@ function pru_power_supply {
     popd
 
     echo "Running eth-bridge-pru-serial485 on ports 5000 and 6000"
-    sleep 5
     systemctl start eth-bridge-pru-serial485.service
     sleep 5
 
     echo "Running Ponte-py at port 4000"
     pushd /root/ponte-py
-        python-sirius Ponte.py
+        python-sirius Ponte.py &
     popd
 }
 

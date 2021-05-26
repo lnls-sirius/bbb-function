@@ -1,16 +1,15 @@
 #!/usr/bin/python-sirius
 # -*- coding: utf-8 -*-
+
+import argparse
+import json
 import logging
 import time
-import argparse
 
-from sys import argv
 from serial import Serial
-from os import environ, path, remove
-from persist import persist_info
-
+from os import path, remove
+from persist import persist_info, write_info
 from consts import *
-
 from devices import  mbtemp, counting_pru, no_tty,\
     power_supply_pru, thermo_probe, mks9376b, agilent4uhv, reset, spixconv
 
@@ -23,6 +22,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--debug', action='store_true')
     parser.add_argument('--reset', action='store_true')
+    parser.add_argument('--secondary', action='store_true')
     args = parser.parse_args()
 
     if args.debug:
@@ -31,6 +31,21 @@ if __name__ == '__main__':
     if args.reset:
         logger.info('Reseting json file...')
         reset()
+        exit(0)
+
+    if args.secondary:
+        logger.info('Getting configuration from primary BBB...')
+        s = Serial(port="/dev/ttyO4", baudrate=115200, timeout=1)
+        
+        device_info = b''
+        while (device_info == b''):
+            device_info = s.read(1000)
+
+        device_info = json.loads(device_info)
+
+        write_info(DEVICE_JSON, json.dumps(device_info))
+        write_info(BAUDRATE_FILE, str(device_info['baudrate']))
+        write_info(RES_FILE, device_info['details'].split(" -  ")[0])
         exit(0)
 
     logger.info('Iterating through possible devices ...')

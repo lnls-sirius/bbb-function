@@ -1,1 +1,3 @@
 *.bak
+.flake8
+*.toml

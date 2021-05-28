@@ -8,6 +8,7 @@ import Adafruit_BBIO.GPIO as GPIO
 from PRUserial485 import PRUserial485_address
 from logger import get_logger
 from autoConfig import AutoConfig
+from counters_addr import Addressing # Do not remove
 
 logger = get_logger("key_dhcp")
 

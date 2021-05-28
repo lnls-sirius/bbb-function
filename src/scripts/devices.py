@@ -27,6 +27,7 @@ SPIxCONV = False
 
 if os.path.exists("/root/SPIxCONV/software/scripts"):
     sys.path.append("/root/SPIxCONV/software/scripts")
+    import init # Do not remove, runs SPI init script
     import flash
     import selection
 

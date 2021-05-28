@@ -1,11 +1,13 @@
 #!/usr/bin/python
 import json
-import logging
 from datetime import datetime
 from consts import RES_FILE, BAUDRATE_FILE, DEVICE_JSON
-logger = logging.getLogger('Whoami')
+from logger import get_logger
 
-def persist_info(device, baud, exit_code, details='No details.'):
+logger = get_logger("Whoami")
+
+
+def persist_info(device, baud, exit_code, details="No details."):
     """
     This method persist the information about which device is connected to this sbc.
     The info is stored using the following format:
@@ -19,19 +21,24 @@ def persist_info(device, baud, exit_code, details='No details.'):
     if exit_code != None:
         write_info(RES_FILE, exit_code)
     if type(baud) != int:
-        raise TypeError('baud type is incorrect. ', baud)
+        raise TypeError("baud type is incorrect. ", baud)
 
     write_info(BAUDRATE_FILE, str(baud))
 
-    device_info = {'device': device, 'baudrate': baud, 'details': str(exit_code) + " -  " + details, 'time': str(datetime.now())}
+    device_info = {
+        "device": device,
+        "baudrate": baud,
+        "details": str(exit_code) + " -  " + details,
+        "time": str(datetime.now()),
+    }
 
-    logger.info('Device Identified !')
+    logger.info("Device Identified!")
     write_info(DEVICE_JSON, json.dumps(device_info))
     exit(0)
 
 
 def write_info(file_name, data):
-    logger.info('Persisting {} at {}.'.format(data, file_name))
-    file = open(file_name, 'w+')
+    logger.info("Persisting {} at {}.".format(data, file_name))
+    file = open(file_name, "w+")
     file.writelines(data)
     file.close()

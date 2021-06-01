@@ -4,6 +4,7 @@
 import Adafruit_BBIO.GPIO as GPIO
 import Adafruit_BBIO.UART as UART
 import sys
+import time
 
 # ----- CONSTANTS
 PRIMARY = 1
@@ -19,6 +20,14 @@ GPIO.setup(outputPin, GPIO.OUT)
 UART.setup("UART4")
 
 if "clean" in sys.argv:
+    GPIO.output(outputPin, GPIO.LOW)
+    exit(0)
+
+elif "force-primary" in sys.argv:
+    GPIO.output(outputPin, GPIO.HIGH)
+    exit(0)
+
+elif "force-secondary" in sys.argv:
     GPIO.output(outputPin, GPIO.LOW)
     exit(0)
 

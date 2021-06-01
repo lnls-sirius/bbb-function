@@ -48,7 +48,7 @@ if __name__ == "__main__":
         
         device_info = b''
         while (device_info == b''):
-            device_info = s.read(1000)
+            device_info = s.read(1000).split(b'-----')[0]
 
         device_info = json.loads(device_info)
 

@@ -12,7 +12,7 @@ PROJECT=$1
 if [ ! -z ${PROJECT} ]; then
         # -------------------------------------------------------------------------
         # Check whether Rsync Server is available - First item in rsync.conf must be "online"
-        SYNC_AVAILABLE=`rsync -n --contimeout=5 $RSYNC_SERVER::`;
+        SYNC_AVAILABLE=`rsync -n --contimeout=2 $RSYNC_SERVER::`;
         if [ "${SYNC_AVAILABLE%% *}" = "online" ]; then
             # ---------------------------------------------------------------------
             # etc-folder files

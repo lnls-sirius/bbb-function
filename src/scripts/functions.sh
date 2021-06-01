@@ -21,7 +21,7 @@ function bbb_primary_secondary {
 function startup_primaryLoop {
     echo Starting up primaryLoop
     pushd ${FUNCTION_BASE}/src/scripts/
-        ./primaryLoop.py
+        ./redundancyLoop.py --mode primary
     popd
 }
 
@@ -29,10 +29,14 @@ function startup_primaryLoop {
 function startup_secondaryLoop {
     echo Starting up secondaryLoop
     pushd ${FUNCTION_BASE}/src/scripts/
-        ./secondaryLoop.py
+        ./redundancyLoop.py --mode secondary
     popd
 }
 
+
+function stop_applications {
+    systemctl stop eth-bridge-pru-serial485
+}
 
 function rsync_PRUserial485 {
     pushd ${FUNCTION_BASE}/src/scripts/
@@ -223,12 +227,12 @@ function pru_power_supply {
 
     echo "Running eth-bridge-pru-serial485 on ports 5000 and 6000"
     systemctl start eth-bridge-pru-serial485.service
-    sleep 5
+    #sleep 5
 
-    echo "Running Ponte-py at port 4000"
-    pushd /root/ponte-py
-        python-sirius Ponte.py &
-    popd
+    #echo "Running Ponte-py at port 4000"
+    #pushd /root/ponte-py
+    #    python-sirius Ponte.py &
+    #popd
 }
 
 function serial_thermo {

@@ -51,7 +51,7 @@ GPIO.setup(PIN_RS232_RS485, GPIO.IN)
 logger = logging.getLogger("Whoami")
 
 
-counters = Addressing()
+
 
 
 def reset():
@@ -67,6 +67,7 @@ def counting_pru():
     """
     logger.debug("Counting PRU")
     if PRUserial485_address() != 21 and not os.path.isfile(PORT):
+        counters = Addressing()
         os.system("/root/counting-pru/src/DTO_CountingPRU.sh")
         persist_info(
             Type.COUNTING_PRU,

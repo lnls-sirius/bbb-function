@@ -247,22 +247,22 @@ function serial_thermo {
 function mks {
     sync_PRUserial485
     overlay_PRUserial485
-    socat TCP-LISTEN:5002,reuseaddr,fork,nodelay FILE:/dev/ttyUSB0,b115200
+    socat TCP-LISTEN:5002,reuseaddr,fork,nodelay FILE:/dev/ttyUSB0,b115200 &
 }
 
 function uhv {
     overlay_PRUserial485
-    socat TCP-LISTEN:5004,reuseaddr,fork,nodelay FILE:${SOCAT_DEVICE},b${BAUDRATE}
+    socat TCP-LISTEN:5004,reuseaddr,fork,nodelay FILE:${SOCAT_DEVICE},b${BAUDRATE} &
 }
 
 function mbtemp {
     overlay_PRUserial485
     echo  "Starting socat..."
-    socat TCP-LISTEN:5003,reuseaddr,fork,nodelay FILE:${SOCAT_DEVICE},b${BAUDRATE}
+    socat TCP-LISTEN:5003,reuseaddr,fork,nodelay FILE:${SOCAT_DEVICE},b${BAUDRATE} &
 }
 
 function socat_devices {
     overlay_PRUserial485
     echo  "Starting socat..."
-    socat TCP-LISTEN:${SOCAT_PORT},reuseaddr,fork,nodelay FILE:${SOCAT_DEVICE},b${BAUDRATE},rawer
+    socat TCP-LISTEN:${SOCAT_PORT},reuseaddr,fork,nodelay FILE:${SOCAT_DEVICE},b${BAUDRATE},rawer&
 }

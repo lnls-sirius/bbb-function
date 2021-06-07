@@ -11,6 +11,14 @@ pushd ${FUNCTION_BASE}/src/scripts
 #        resetDeviceJson
         systemctl stop eth-bridge-pru-serial485
 
+        # Kill SOCAT if running
+        socatPID=$(pgrep -f socat)
+        [[ $socatPID ]] && kill $socatPID
+
+        # Kill PONTE.PY if running
+        pontePID=$(pgrep -f Ponte)
+        [[ $pontePID ]] && kill $pontePID
+
         if [ -f ${RES_FILE} ]; then
                 rm -rf ${RES_FILE}
         fi

@@ -71,39 +71,39 @@ def getInfo(mode, this_epoch):
                 ipaddr = info.split(SEPARATOR)[1]
                 matching_bbb = info.split(SEPARATOR)[2]
                 matching_epoch = float(info.split(SEPARATOR)[3])
-                print("Matching is ", matching_bbb)
 
                 r.hset("device", "matching_ip_address", ipaddr)
                 r.hset("device", "matching_bbb", matching_bbb)
                 r.hset("device", "matching_epoch", matching_epoch)
 
                 if matching_bbb == mode.encode():
-                    if not subprocess.call(["ping", "-w", "500","-c", "1", SERVER_IP], stdout=subprocess.DEVNULL):
+                    if not subprocess.call(["ping", "-w", "1","-c", "1", SERVER_IP], stdout=subprocess.DEVNULL):
                         if matching_epoch > this_epoch:
-                            print("Both BBBs with same config. Aborting older one")
+                            logger.info("Both BBBs with same config and this one is older. Mode swapping.")
                             errorStatus[mode] = True
                     else:
-                        print("Both BBBs with same config. Aborting older one")
+                        logger.info("Both BBBs with same config. This one is not connected to SERVER. Mode Swapping")
                         errorStatus[mode] = True
             except:
                 time.sleep(1)
         else:
-            countdown -= 1
+            countdown -= 1 
             
             if countdown == 0 and mode == "secondary":
                 errorStatus[mode] = True
             elif mode == "primary":
                 countdown = int(ERROR_DELAY / TIMEOUT)
 
-
 def pingPrimary(mode):
     global errorPing
-    countdown = int(ERROR_DELAY / TIMEOUT / 5)
+    countdown = int(ERROR_DELAY / TIMEOUT / 2)
     while True:
         primary_bbb = r.hget("device", "matching_ip_address")
         if primary_bbb:
-            not_ping_primary = subprocess.call(["ping", "-w", "500","-c", "1", primary_bbb], stdout=subprocess.DEVNULL)
-            not_ping_server = subprocess.call(["ping", "-w", "500","-c", "1", SERVER_IP], stdout=subprocess.DEVNULL)
+
+            not_ping_primary = subprocess.call(["ping", "-w", "1","-c", "1", primary_bbb], stdout=subprocess.DEVNULL)
+            not_ping_server = subprocess.call(["ping", "-w", "1","-c", "1", SERVER_IP], stdout=subprocess.DEVNULL)
+
             # Ping not responsive
             if not_ping_primary and not not_ping_server:
                 countdown -= 1
@@ -178,5 +178,5 @@ if __name__ == "__main__":
         time.sleep(1)
 
         if errorStatus[args.mode] or errorPing[args.mode]:
-            print("Error while monitoring {} BBB. Exiting and restarting application".format(args.mode))
+            logger.info("Error while monitoring {} BBB. Exiting, swapping mode and restarting applications".format(args.mode))
             exit(errorExit[args.mode])

@@ -24,7 +24,7 @@ from devices import (
 
 
 
-logger = get_logger("Whoami")
+logger = get_logger("detectEquipment")
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
@@ -70,10 +70,9 @@ if __name__ == "__main__":
 
     # Loop until detect something
     while not path.isfile(RES_FILE) or not path.isfile(BAUDRATE_FILE):
+        logger.info('Searching...')
         try:
             spixconv()
-
-            # @todo: This should be more robust !
             counting_pru()
             power_supply_pru()
             thermo_probe()

@@ -10,7 +10,7 @@ from logger import get_logger
 from autoConfig import AutoConfig
 from counters_addr import Addressing # Do not remove
 
-logger = get_logger("key_dhcp")
+logger = get_logger("dhcpConfig")
 
 LED_PIN = "P8_28"
 

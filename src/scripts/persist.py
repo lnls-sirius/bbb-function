@@ -4,7 +4,7 @@ from datetime import datetime
 from consts import RES_FILE, BAUDRATE_FILE, DEVICE_JSON
 from logger import get_logger
 
-logger = get_logger("Whoami")
+logger = get_logger("Persist")
 
 
 def persist_info(device, baud, exit_code, details="No details."):

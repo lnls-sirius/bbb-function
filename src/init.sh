@@ -7,17 +7,7 @@ source ${FUNCTION_BASE}/src/envs.sh
 pushd ${FUNCTION_BASE}/src/scripts
 
     function cleanup {
-        # Reset the detected device
-#        resetDeviceJson
-        systemctl stop eth-bridge-pru-serial485
-
-        # Kill SOCAT if running
-        socatPID=$(pgrep -f socat)
-        [[ $socatPID ]] && kill $socatPID
-
-        # Kill PONTE.PY if running
-        pontePID=$(pgrep -f Ponte)
-        [[ $pontePID ]] && kill $pontePID
+        stop_applications
 
         if [ -f ${RES_FILE} ]; then
                 rm -rf ${RES_FILE}

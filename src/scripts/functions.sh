@@ -36,6 +36,14 @@ function startup_secondaryLoop {
 
 function stop_applications {
     systemctl stop eth-bridge-pru-serial485
+
+    # Kill SOCAT if running
+    socatPID=$(pgrep -f socat)
+    [[ $socatPID ]] && kill $socatPID
+
+    # Kill PONTE.PY if running
+    pontePID=$(pgrep -f Ponte)
+    [[ $pontePID ]] && kill $pontePID
 }
 
 function rsync_PRUserial485 {
@@ -206,8 +214,6 @@ function startup_HardReset {
 
 function spixconv {
     echo SPIXCONV detected.
-#    echo Synchronizing SPIxCONV files
-#    rsync_SPIxCONV
 
     overlay_PRUserial485
     overlay_SPIxCONV

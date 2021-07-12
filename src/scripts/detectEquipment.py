@@ -1,46 +1,71 @@
 #!/usr/bin/python-sirius
 # -*- coding: utf-8 -*-
+
+import argparse
+import json
 import logging
 import time
-import argparse
-
-from sys import argv
 from serial import Serial
-from os import environ, path, remove
-from persist import persist_info
+from os import path, remove
 
 from consts import *
+from persist import persist_info, write_info
+from logger import get_logger
+from devices import (
+    mbtemp,
+    counting_pru,
+    power_supply_pru,
+    thermo_probe,
+    mks9376b,
+    agilent4uhv,
+    reset,
+    spixconv,
+)
 
-from devices import  mbtemp, counting_pru, no_tty,\
-    power_supply_pru, thermo_probe, mks9376b, agilent4uhv, reset, spixconv
 
-logging.basicConfig(level=logging.INFO,
-                    format='[%(levelname)s] %(asctime)-15s %(message)s',
-                    datefmt='%d/%m/%Y %H:%M:%S')
-logger = logging.getLogger('Whoami')
 
-if __name__ == '__main__':
+logger = get_logger("Whoami")
+
+if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument('--debug', action='store_true')
     parser.add_argument('--reset', action='store_true')
+    parser.add_argument('--secondary', action='store_true')
+
     args = parser.parse_args()
 
     if args.debug:
         logger.setLevel(logging.DEBUG)
 
     if args.reset:
-        logger.info('Reseting json file...')
+        logger.info("Reseting json file...")
         reset()
         exit(0)
 
+    if args.secondary:
+        logger.info('Getting configuration from primary BBB...')
+        s = Serial(port="/dev/ttyO4", baudrate=115200, timeout=1)
+        
+        device_info = b''
+        while (device_info == b''):
+            device_info = s.read(1000)
+
+        device_info = json.loads(device_info)
+
+        write_info(DEVICE_JSON, json.dumps(device_info))
+        write_info(BAUDRATE_FILE, str(device_info['baudrate']))
+        write_info(RES_FILE, device_info['details'].split(" -  ")[0])
+        exit(0)
+
     logger.info('Iterating through possible devices ...')
+
     try:
         remove(RES_FILE)
-    except :
+    except:
         pass
     try:
         remove(BAUDRATE_FILE)
-    except :
+    except:
         pass
 
     # Loop until detect something
@@ -48,7 +73,7 @@ if __name__ == '__main__':
         try:
             spixconv()
 
-            #@todo: This should be more robust !
+            # @todo: This should be more robust !
             counting_pru()
             power_supply_pru()
             thermo_probe()
@@ -59,8 +84,8 @@ if __name__ == '__main__':
         except SystemExit:
             exit()
         except:
-            logger.exception('Something wrong happened !')
+            logger.exception("Something wrong happened !")
 
-        time.sleep(2.)
+        time.sleep(2.0)
 
-    logger.info('End of the identification Script ...')
+    logger.info("End of the identification Script ...")

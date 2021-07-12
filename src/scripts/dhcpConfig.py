@@ -17,7 +17,7 @@ logger = logging.getLogger('key_dhcp')
 
 LED_PIN = "P8_28"
 
-CONFIGURED_SUBNETS = ['102','103']
+CONFIGURED_SUBNETS = ['102','103','104','105']
 
 
 

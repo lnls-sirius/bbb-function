@@ -7,9 +7,7 @@ source ${FUNCTION_BASE}/src/envs.sh
 pushd ${FUNCTION_BASE}/src/scripts
 
     function cleanup {
-        # Reset the detected device
-#        resetDeviceJson
-        systemctl stop eth-bridge-pru-serial485
+        stop_applications
 
         if [ -f ${RES_FILE} ]; then
                 rm -rf ${RES_FILE}
@@ -56,48 +54,64 @@ pushd ${FUNCTION_BASE}/src/scripts
     BAUDRATE=$(awk NR==1 ${BAUDRATE_FILE})
 
     # Running application
-    if [[ ${BBB_STATUS} = "PRIMARY" ]]; then
-        
-        if [[ ${CONN_DEVICE} = "${SPIXCONV}" ]]; then
-            # Using variable BAUDRATE to store the board address
-            spixconv ${BAUDRATE}
+    while [ 1 ]
+    do
+        if [[ ${BBB_STATUS} = "PRIMARY" ]]; then
+            
+            if [[ ${CONN_DEVICE} = "${SPIXCONV}" ]]; then
+                # Using variable BAUDRATE to store the board address
+                spixconv ${BAUDRATE}
 
-        elif [[ ${CONN_DEVICE} = "${PRU_POWER_SUPPLY}" ]]; then
-            pru_power_supply
+            elif [[ ${CONN_DEVICE} = "${PRU_POWER_SUPPLY}" ]]; then
+                pru_power_supply
 
-        elif [[ ${CONN_DEVICE} = "${COUNTING_PRU}" ]]; then
-            counting_pru
+            elif [[ ${CONN_DEVICE} = "${COUNTING_PRU}" ]]; then
+                counting_pru
 
-        elif [[ ${CONN_DEVICE} = "${SERIAL_THERMO}" ]]; then
-            serial_thermo
+            elif [[ ${CONN_DEVICE} = "${SERIAL_THERMO}" ]]; then
+                serial_thermo
 
-        elif [[ ${CONN_DEVICE} = "${MKS937B}" ]]; then
-            mks
+            elif [[ ${CONN_DEVICE} = "${MKS937B}" ]]; then
+                mks
 
-        elif [[ ${CONN_DEVICE} = "${AGILENT4UHV}" ]]; then
-            uhv
+            elif [[ ${CONN_DEVICE} = "${AGILENT4UHV}" ]]; then
+                uhv
 
-        elif [[ ${CONN_DEVICE} = "${MBTEMP}" ]]; then
-            mbtemp
+            elif [[ ${CONN_DEVICE} = "${MBTEMP}" ]]; then
+                mbtemp
 
-        elif [ ! -z ${CONN_DEVICE} ]; then
-            socat_devices
+            elif [ ! -z ${CONN_DEVICE} ]; then
+                socat_devices
 
-        else
-            if [[ ${CONN_DEVICE} = "${NOTTY}" ]]; then
-                echo No matching device has been found. ttyUSB0 is disconnected.
             else
-                echo  Unknown device. Nothing has been done.
+                if [[ ${CONN_DEVICE} = "${NOTTY}" ]]; then
+                    echo No matching device has been found. ttyUSB0 is disconnected.
+                else
+                    echo  Unknown device. Nothing has been done.
+                fi
+                exit 1
             fi
-            exit 1
+
+            pushd ${FUNCTION_BASE}/src/scripts/
+                ./redundancyLoop.py --mode primary
+                export EXIT_VALUE=$?
+                if [[ ${EXIT_VALUE} = "2" ]]; then
+                    export BBB_STATUS="SECONDARY"
+                    ./bbbPrimarySecondary.py force-secondary
+                fi
+            popd
+
+        elif [[ ${BBB_STATUS} = "SECONDARY" ]]; then
+            pushd ${FUNCTION_BASE}/src/scripts/
+                ./redundancyLoop.py --mode secondary
+                export EXIT_VALUE=$?
+                if [[ ${EXIT_VALUE} = "1" ]]; then
+                    export BBB_STATUS="PRIMARY"
+                    ./bbbPrimarySecondary.py force-primary
+                fi
+            popd
         fi
-
-        echo "STREAM INFO AND MONITOR SLAVE HERE!"
-        startup_primaryLoop
-
-    elif [[ ${BBB_STATUS} = "SECONDARY" ]]; then
-        echo "Secondary BBB..."
-        startup_secondaryLoop
-    fi
-
+        echo "Cleaning up services"
+        stop_applications
+    done
 popd

@@ -21,7 +21,7 @@ function bbb_primary_secondary {
 function startup_primaryLoop {
     echo Starting up primaryLoop
     pushd ${FUNCTION_BASE}/src/scripts/
-        ./primaryLoop.py
+        ./redundancyLoop.py --mode primary
     popd
 }
 
@@ -29,10 +29,22 @@ function startup_primaryLoop {
 function startup_secondaryLoop {
     echo Starting up secondaryLoop
     pushd ${FUNCTION_BASE}/src/scripts/
-        ./secondaryLoop.py
+        ./redundancyLoop.py --mode secondary
     popd
 }
 
+
+function stop_applications {
+    systemctl stop eth-bridge-pru-serial485
+
+    # Kill SOCAT if running
+    socatPID=$(pgrep -f socat)
+    [[ $socatPID ]] && kill $socatPID
+
+    # Kill PONTE.PY if running
+    pontePID=$(pgrep -f Ponte)
+    [[ $pontePID ]] && kill $pontePID
+}
 
 function rsync_PRUserial485 {
     pushd ${FUNCTION_BASE}/src/scripts/
@@ -202,8 +214,6 @@ function startup_HardReset {
 
 function spixconv {
     echo SPIXCONV detected.
-#    echo Synchronizing SPIxCONV files
-#    rsync_SPIxCONV
 
     overlay_PRUserial485
     overlay_SPIxCONV
@@ -223,12 +233,12 @@ function pru_power_supply {
 
     echo "Running eth-bridge-pru-serial485 on ports 5000 and 6000"
     systemctl start eth-bridge-pru-serial485.service
-    sleep 5
+    #sleep 5
 
-    echo "Running Ponte-py at port 4000"
-    pushd /root/ponte-py
-        python-sirius Ponte.py &
-    popd
+    #echo "Running Ponte-py at port 4000"
+    #pushd /root/ponte-py
+    #    python-sirius Ponte.py &
+    #popd
 }
 
 function serial_thermo {
@@ -243,22 +253,22 @@ function serial_thermo {
 function mks {
     sync_PRUserial485
     overlay_PRUserial485
-    socat TCP-LISTEN:5002,reuseaddr,fork,nodelay FILE:/dev/ttyUSB0,b115200
+    socat TCP-LISTEN:5002,reuseaddr,fork,nodelay FILE:/dev/ttyUSB0,b115200 &
 }
 
 function uhv {
     overlay_PRUserial485
-    socat TCP-LISTEN:5004,reuseaddr,fork,nodelay FILE:${SOCAT_DEVICE},b${BAUDRATE}
+    socat TCP-LISTEN:5004,reuseaddr,fork,nodelay FILE:${SOCAT_DEVICE},b${BAUDRATE} &
 }
 
 function mbtemp {
     overlay_PRUserial485
     echo  "Starting socat..."
-    socat TCP-LISTEN:5003,reuseaddr,fork,nodelay FILE:${SOCAT_DEVICE},b${BAUDRATE}
+    socat TCP-LISTEN:5003,reuseaddr,fork,nodelay FILE:${SOCAT_DEVICE},b${BAUDRATE} &
 }
 
 function socat_devices {
     overlay_PRUserial485
     echo  "Starting socat..."
-    socat TCP-LISTEN:${SOCAT_PORT},reuseaddr,fork,nodelay FILE:${SOCAT_DEVICE},b${BAUDRATE},rawer
+    socat TCP-LISTEN:${SOCAT_PORT},reuseaddr,fork,nodelay FILE:${SOCAT_DEVICE},b${BAUDRATE},rawer&
 }

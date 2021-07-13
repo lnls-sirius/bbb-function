@@ -313,3 +313,4 @@ def spixconv():
                 )
             )
             persist_info(Type.SPIXCONV, spi_addr, SPIXCONV, "SPIXCONV connected {}".format(spi_addr))
+

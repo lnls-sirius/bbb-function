@@ -21,7 +21,7 @@ class BBB:
 
     CONFIG_JSON_PATH = "/opt/device.json"
 
-    def __init__(self, path="/var/tmp/bbb.bin", interface="eth0"):
+    def __init__(self, path="/var/tmp/bbb.bin", interface="eth0", logfile="/var/log/bbbfunction.log"):
         """
         Creates a new object instance.
         :param path: the configuration file's location
@@ -30,7 +30,7 @@ class BBB:
         # Creates the objects that wrap the host's settings.
         self.node = Node()
 
-        self.logger = get_logger("BBB")
+        self.logger = get_logger("BBB", logfile)
         self.logger.debug(traceback.extract_stack()[-2])
 
         #  Parameters that define absolute locations inside the host

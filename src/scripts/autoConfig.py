@@ -19,7 +19,7 @@ logger = get_logger("AutoConfig")
 # Constants
 COUNTINGPRU_ID = 0
 SERIALXXCON_ID = 21
-CONFIGURED_SUBNETS = ["6", "102", "103", "104", "105"]
+CONFIGURED_SUBNETS = ["102", "103", "104", "105", "106"]
 
 
 class AutoConfig:
@@ -167,7 +167,7 @@ if __name__ == "__main__":
                     "manual",
                     new_ip_address=new_ip,
                     new_mask="255.255.255.0",
-                    new_gateway="10.0.{}.1".format(subnet),
+                    new_gateway="10.128.{}.1".format(subnet),
                 )
             else:
                 if not (IP_AVAILABLE_1 or IP_AVAILABLE_2):
@@ -234,7 +234,7 @@ if __name__ == "__main__":
                         "manual",
                         new_ip_address=new_ip,
                         new_mask="255.255.255.0",
-                        new_gateway="10.0.{}.1".format(subnet),
+                        new_gateway="10.128.{}.1".format(subnet),
                     )
                 else:
                     if not (IP_AVAILABLE_1 or IP_AVAILABLE_2):

@@ -72,8 +72,6 @@ if __name__ == "__main__":
     while not path.isfile(RES_FILE) or not path.isfile(BAUDRATE_FILE):
         try:
             spixconv()
-
-            # @todo: This should be more robust !
             counting_pru()
             power_supply_pru()
             thermo_probe()

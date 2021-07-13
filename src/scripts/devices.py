@@ -21,7 +21,6 @@ from counters_addr import Addressing
 sys.path.append(os.path.join(os.path.dirname(os.path.realpath(__file__)), "../../../"))
 from bbb import Type
 
-logger = get_logger("Whoami")
 
 SPIxCONV = False
 
@@ -48,10 +47,7 @@ RS485 = 1
 GPIO.setup(PIN_FTDI_PRU, GPIO.IN)
 GPIO.setup(PIN_RS232_RS485, GPIO.IN)
 
-logger = logging.getLogger("Whoami")
-
-
-counters = Addressing()
+logger = get_logger("Devices")
 
 
 def reset():
@@ -66,7 +62,8 @@ def counting_pru():
     CountingPRU
     """
     logger.debug("Counting PRU")
-    if PRUserial485_address() != 21 and not os.path.isfile(PORT):
+    if PRUserial485_address() != 21 and not os.path.exists(PORT):
+        counters = Addressing()
         os.system("/root/counting-pru/src/DTO_CountingPRU.sh")
         persist_info(
             Type.COUNTING_PRU,
@@ -150,7 +147,7 @@ def thermo_probe():
         GPIO.input(PIN_FTDI_PRU) == FTDI
         and GPIO.input(PIN_RS232_RS485) == RS485
         and PRUserial485_address() == 21
-        and os.path.isfile(PORT)
+        and os.path.exists(PORT)
     ):
         baud = 19200
         ser = Serial(
@@ -197,7 +194,7 @@ def mbtemp():
         GPIO.input(PIN_FTDI_PRU) == FTDI
         and GPIO.input(PIN_RS232_RS485) == RS485
         and PRUserial485_address() == 21
-        and os.path.isfile(PORT)
+        and os.path.exists(PORT)
     ):
         baud = 115200
         ser = Serial(PORT, baud, timeout=TIMEOUT)
@@ -221,7 +218,7 @@ def mks9376b():
         GPIO.input(PIN_FTDI_PRU) == FTDI
         and GPIO.input(PIN_RS232_RS485) == RS485
         and PRUserial485_address() == 21
-        and os.path.isfile(PORT)
+        and os.path.exists(PORT)
     ):
         baud = 115200
         ser = Serial(port=PORT, baudrate=baud, timeout=0.05)
@@ -261,7 +258,7 @@ def agilent4uhv():
         GPIO.input(PIN_FTDI_PRU) == FTDI
         and GPIO.input(PIN_RS232_RS485) == RS485
         and PRUserial485_address() == 21
-        and os.path.isfile(PORT)
+        and os.path.exists(PORT)
     ):
         baud = 38400
         ser = Serial(port=PORT, baudrate=baud, timeout=0.6)
@@ -316,3 +313,4 @@ def spixconv():
                 )
             )
             persist_info(Type.SPIXCONV, spi_addr, SPIXCONV, "SPIXCONV connected {}".format(spi_addr))
+

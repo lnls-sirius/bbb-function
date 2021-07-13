@@ -7,7 +7,7 @@ from bbb import BBB
 import serial
 import time
 from consts import SEPARATOR, DEVICE_JSON, SERVER_IP
-import redis
+#import redis
 import argparse
 from logger import get_logger
 import threading
@@ -140,6 +140,7 @@ if __name__ == "__main__":
         )
     args = parser.parse_args()
 
+    '''
     # Config UART
     s = serial.Serial(port="/dev/ttyO4", baudrate=115200, timeout=TIMEOUT)
 
@@ -149,6 +150,7 @@ if __name__ == "__main__":
     r.hset("device", "redundancy_epoch", time.time())
     r.hset("device", "matching_ip_address", "")
     r.hset("device", "matching_bbb", "")
+    '''
 
     # Config LED
     GPIO.setup(LED, GPIO.OUT)
@@ -163,14 +165,14 @@ if __name__ == "__main__":
 
     # Continuous loop - Threads
     blinkThread = threading.Thread(target=blinkLED, args=[args.mode], daemon=True)
-    streamThread = threading.Thread(target=streamInfo, args=[args.mode, time.time()], daemon=True)
-    infoThread  = threading.Thread(target=getInfo, args=[args.mode, time.time()], daemon=True)
+    #streamThread = threading.Thread(target=streamInfo, args=[args.mode, time.time()], daemon=True)
+    #infoThread  = threading.Thread(target=getInfo, args=[args.mode, time.time()], daemon=True)
     if args.mode == "secondary":
         pingThread  = threading.Thread(target=pingPrimary, args=[args.mode], daemon=True)
 
     blinkThread.start()
-    streamThread.start()
-    infoThread.start()
+    #streamThread.start()
+    #infoThread.start()
     if args.mode == "secondary":
         pingThread.start()
 

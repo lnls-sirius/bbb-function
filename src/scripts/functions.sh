@@ -251,7 +251,6 @@ function serial_thermo {
 }
 
 function mks {
-    sync_PRUserial485
     overlay_PRUserial485
     socat TCP-LISTEN:5002,reuseaddr,fork,nodelay FILE:/dev/ttyUSB0,b115200 &
 }

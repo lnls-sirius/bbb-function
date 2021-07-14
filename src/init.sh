@@ -66,6 +66,7 @@ pushd ${FUNCTION_BASE}/src/scripts
                 pru_power_supply
 
             elif [[ ${CONN_DEVICE} = "${COUNTING_PRU}" ]]; then
+                startup_blinkingLED
                 counting_pru
 
             elif [[ ${CONN_DEVICE} = "${SERIAL_THERMO}" ]]; then

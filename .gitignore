@@ -2,3 +2,4 @@
 .flake8
 *.toml
 src/scripts/__pycache__/*
+*.swp

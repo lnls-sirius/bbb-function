@@ -63,6 +63,7 @@ function synchronize_common {
     pushd ${FUNCTION_BASE}/src/scripts/
         echo "Synchronizing startup scripts and pru-serial485 and SPIxCONV"
         ./rsync_beaglebone.sh startup-scripts
+        ./rsync_beaglebone.sh counting-pru
         rsync_PRUserial485
         rsync_SPIxCONV
 

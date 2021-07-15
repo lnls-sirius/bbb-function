@@ -19,7 +19,7 @@ logger = get_logger("AutoConfig")
 # Constants
 COUNTINGPRU_ID = 0
 SERIALXXCON_ID = 21
-CONFIGURED_SUBNETS = ["102", "103", "104", "105", "106"]
+CONFIGURED_SUBNETS = ["102", "103", "104", "105", "106", "107", "108", "109", "110", "111"]
 
 
 class AutoConfig:
@@ -183,8 +183,8 @@ if __name__ == "__main__":
                 else:
                     logger.error(
                         "Cannot change to IP {} / {}, subnet is not compatible to current one ({}).".format(
-                            mybeagle_config[BBB_IP_1_COLUMN], 
-                            mybeagle_config[BBB_IP_2_COLUMN], 
+                            mybeagle_config[BBB_IP_1_COLUMN],
+                            mybeagle_config[BBB_IP_2_COLUMN],
                             mybbb.currentSubnet
                         )
                     )
@@ -250,8 +250,8 @@ if __name__ == "__main__":
                     else:
                         logger.error(
                             "Cannot change to IP {} / {}, subnet is not compatible to current one ({}).".format(
-                                mybeagle_config[BBB_IP_1_COLUMN], 
-                                mybeagle_config[BBB_IP_2_COLUMN], 
+                                mybeagle_config[BBB_IP_1_COLUMN],
+                                mybeagle_config[BBB_IP_2_COLUMN],
                                 mybbb.currentSubnet
                             )
                         )

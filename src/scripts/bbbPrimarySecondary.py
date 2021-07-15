@@ -17,7 +17,7 @@ GPIO.setup(inputPin, GPIO.IN)
 GPIO.setup(outputPin, GPIO.OUT)
 
 # ----- UART Config
-UART.setup("UART4")
+#UART.setup("UART4")
 
 if "clean" in sys.argv:
     GPIO.output(outputPin, GPIO.LOW)

@@ -1,13 +1,12 @@
 #!/usr/bin/python-sirius
 # -*- coding: utf-8 -*-
 
-import Adafruit_BBIO.UART as UART
 import Adafruit_BBIO.GPIO as GPIO
 from bbb import BBB
 import serial
 import time
 from consts import SEPARATOR, DEVICE_JSON, SERVER_IP
-#import redis
+import redis
 import argparse
 from logger import get_logger
 import threading

@@ -7,11 +7,9 @@ sed -i -e 's/RSYNC_SERVER.*$/RSYNC_SERVER="10.128.255.5"/' /root/.bashrc
 export RSYNC_LOCAL="/root"
 export RSYNC_PORT="873"
 
-# Generate the initial device.json
-
+# Env vars
 pushd ${FUNCTION_BASE}/src/scripts/
     source ./../envs.sh
-    ./dhcpConfig.py   #Verificar se dhcp deve ser configurado
 popd
 
 
@@ -33,6 +31,13 @@ if [ $? -eq 0 ]; then
 else
     echo "Rsync server not available for bbb-function upgrading"
 fi
+
+
+# IP configuring - if autoConfig
+pushd ${FUNCTION_BASE}/src/scripts/
+    source ./../envs.sh
+    ./dhcpConfig.py   #Verificar se dhcp deve ser configurado
+popd
 
 
 # BBB-function application

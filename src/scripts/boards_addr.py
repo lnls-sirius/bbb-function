@@ -5,7 +5,12 @@ from CountingPRU import *
 from Adafruit_BBIO import GPIO
 
 
-class Addressing:
+def update_file(file_path="./", value=""):
+    with open("{}.addr.log".format(file_path), "w") as address:
+        address.write(str(value) + "\n")
+        address.close()
+
+class coutingPRU_addr:
     def __init__(self, f_xtal=8e6):
 
         self.clk_default = f_xtal / 2 ** 4
@@ -14,16 +19,11 @@ class Addressing:
         self.CH3 = "P9_14"
 
         self.logger = logging.getLogger()
-        self.logger.info("Checking Board Address")
+        self.logger.info("Checking Board Address - CountingPRU")
 
         for channel in [self.CH1, self.CH3]:
             GPIO.setup(channel, GPIO.OUT)
             GPIO.output(channel, GPIO.LOW)
-
-    def update_file(self, file_path="./", value=""):
-        with open("{}.addr.log".format(file_path), "w") as address:
-            address.write(str(value) + "\n")
-            address.close()
 
     def autoConfig_Available(self):
 
@@ -64,6 +64,24 @@ class Addressing:
         self.logger.info("Board Address is {}".format(addr))
         return addr
 
+class simar_addr:
+    def __init__(self):
+        self.logger = logging.getLogger()
+        self.logger.info("Checking Board Address - SIMAR")
 
-if __name__ == "__main__":
-    count = Addressing()
+        self.addr_pins = ["P9_26", "P9_25", "P9_24", "P9_23", "P9_41"]
+
+        for pin in self.addr_pins:
+            GPIO.setup(pin, GPIO.IN)
+
+    def autoConfig_Available(self):
+        '''If both addr 4 and addr 3 are TRUE, autoConfig are available'''
+
+        return(GPIO.input("P9_41") == 1 and GPIO.input("P9_23") == 1)
+
+    def addr(self):
+        addressing = 0
+        for pow, pin in enumerate(self.addr_pins[:-2]):
+            addressing += GPIO.input("P9_41")*(2**pow)
+
+        return(addressing)

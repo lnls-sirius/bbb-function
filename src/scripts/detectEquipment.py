@@ -20,9 +20,8 @@ from devices import (
     agilent4uhv,
     reset,
     spixconv,
+    simar,
 )
-
-
 
 logger = get_logger("detectEquipment")
 
@@ -72,6 +71,7 @@ if __name__ == "__main__":
     while not path.isfile(RES_FILE) or not path.isfile(BAUDRATE_FILE):
         logger.info('Searching...')
         try:
+            simar()
             spixconv()
             counting_pru()
             power_supply_pru()

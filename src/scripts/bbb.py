@@ -448,8 +448,8 @@ class Type:
     KEY_PREFIX = "Type:"
     KEY_PREFIX_LEN = len(KEY_PREFIX)
 
-    NUM_TYPES = 8
-    UNDEFINED, POWER_SUPPLY, COUNTING_PRU, SERIAL_THERMO, MBTEMP, AGILENT4UHV, MKS937B, SPIXCONV = range(NUM_TYPES)
+    NUM_TYPES = 9
+    UNDEFINED, POWER_SUPPLY, COUNTING_PRU, SERIAL_THERMO, MBTEMP, AGILENT4UHV, MKS937B, SPIXCONV, SIMAR = range(NUM_TYPES)
     TYPES = []
 
     @staticmethod
@@ -482,6 +482,8 @@ class Type:
             return "Desc: Agilent 4UHV"
         elif self.code == Type.MKS937B:
             return "Desc: MKS 937b"
+        elif self.code == Type.SIMAR:
+            return "Desc: Simar"
         elif self.code == Type.SPIXCONV:
             return "Desc: SPIxCONV"
         else:
@@ -502,6 +504,8 @@ class Type:
             return "Agilent 4UHV"
         elif self.code == Type.MKS937B:
             return "MKS 937b"
+        elif self.code == Type.SIMAR:
+            return "Simar"
         elif self.code == Type.SPIXCONV:
             return "SPIxCONV"
         else:

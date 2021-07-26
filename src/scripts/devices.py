@@ -24,6 +24,9 @@ from bbb import Type
 
 SPIxCONV = False
 
+logger = get_logger("Devices")
+
+
 if os.path.exists("/root/SPIxCONV/software/scripts"):
     sys.path.append("/root/SPIxCONV/software/scripts")
     import init # Do not remove, runs SPI init script
@@ -47,7 +50,6 @@ RS485 = 1
 GPIO.setup(PIN_FTDI_PRU, GPIO.IN)
 GPIO.setup(PIN_RS232_RS485, GPIO.IN)
 
-logger = get_logger("Devices")
 
 
 def reset():
@@ -56,6 +58,24 @@ def reset():
     """
     persist_info(0, 0, "RESET", "Searching for connected equipments.")
 
+def simar():
+    """
+    Simar
+    """
+    logger.debug("Simar")
+
+    if not(SPIxCONV):
+        from Adafruit_BBIO import ADC
+        ADC.setup()
+        volts = ADC.read("P9_33") * 1.8
+
+        if abs(volts*11 - 5) < 0.2:
+            persist_info(
+                Type.SIMAR,
+                0,
+                SIMAR,
+                "Connected: [None]. Auto Configuration: False",#@TODO
+            )
 
 def counting_pru():
     """

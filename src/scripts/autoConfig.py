@@ -35,14 +35,22 @@ class AutoConfig:
         if self.get_subnet() in CONFIGURED_SUBNETS:
             # COUNTINGPRU
             if self.boardID == COUNTINGPRU_SIMAR_ID:
+                self.simar = simar_addr()
                 self.counter = countingPRU_addr()
-                #@TODO: Como diferenciar SIMAR e CountingPRU????
-                system("/root/counting-pru/src/DTO_CountingPRU.sh")
-                for i in range(5):
-                    self.status = self.counter.autoConfig_Available()
-                    if self.status:
-                        break
-                    sleep(2)
+
+                if self.simar.IsSimar():
+                    for i in range(5):
+                        self.status = self.simar.autoConfig_Available()
+                        if self.status:
+                            break
+                        sleep(2)
+                else:
+                    system("/root/counting-pru/src/DTO_CountingPRU.sh")
+                    for i in range(5):
+                        self.status = self.counter.autoConfig_Available()
+                        if self.status:
+                            break
+                        sleep(2)
 
             # SERIALxxCON - AUTOCONFIG: RTS and CTS pins tied together (jumper)
             elif self.boardID == SERIALXXCON_ID:

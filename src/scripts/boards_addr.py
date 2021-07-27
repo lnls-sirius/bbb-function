@@ -110,3 +110,10 @@ class simar_addr:
             addressing += GPIO.input("P9_41")*(2**pow)
 
         return(addressing)
+
+    def IsSimar(self):
+        from Adafruit_BBIO import ADC
+        ADC.setup()
+        volts = ADC.read("P9_33") * 1.8
+
+        return(abs(volts * 11 - 5) < 0.2)

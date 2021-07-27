@@ -56,7 +56,7 @@ if __name__ == "__main__":
     # ----------------------------------
     # Apply DHCP config if needed
     # ----------------------------------
-    # COUNTINGPRU
+    # COUNTINGPRU, SIMAR
     if PRUserial485_address() == COUNTINGPRU_ADDRESS:
         if AUTOCONFIG:
             logger.info("AUTOCONFIG enabled. Configuring DHCP.")

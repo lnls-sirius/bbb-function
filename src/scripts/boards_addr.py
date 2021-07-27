@@ -11,17 +11,20 @@ def update_file(file_path="./", value=""):
         address.close()
 
 class coutingPRU_addr:
-    def __init__(self, f_xtal=8e6):
+    def __init__(self, clock = 5e5):
 
-        self.clk_default = f_xtal / 2 ** 4
+        self.clk_default = clock
 
         self.CH1 = "P9_13"
         self.CH3 = "P9_14"
+        
+        self.CH2 = "P9_15"
+        self.CH4 = "P9_16"
 
         self.logger = logging.getLogger()
         self.logger.info("Checking Board Address - CountingPRU")
 
-        for channel in [self.CH1, self.CH3]:
+        for channel in [self.CH1, self.CH2, self.CH3, self.CH4]:
             GPIO.setup(channel, GPIO.OUT)
             GPIO.output(channel, GPIO.LOW)
 
@@ -29,22 +32,29 @@ class coutingPRU_addr:
 
         for channel in [self.CH1, self.CH3]:
             GPIO.output(channel, GPIO.HIGH)
+           
+        for channel in [self.CH2, self.CH4]:
+            GPIO.output(channel, GPIO.LOW)
 
         Init()
         counting = sum(Counting(1)[6:])
         Close()
 
-        status = abs(counting - 488) < 50
+        status = abs(counting - 100000) < 10000
 
         for channel in [self.CH1, self.CH3]:
             GPIO.output(channel, GPIO.LOW)
 
         self.logger.info("Auto configuration status: {}".format(status))
-        return status
+        return(status)
 
     def addr(self):
+        
+        if not(self.check24V()):
+            self.logger.warning("Something wrong with 24Vdc.")
+            return(-1)
 
-        for channel in [self.CH1, self.CH3]:
+        for channel in [self.CH1, self.CH2, self.CH3, self.CH4]:
             GPIO.output(channel, GPIO.LOW)
 
         Init()
@@ -53,16 +63,31 @@ class coutingPRU_addr:
 
         if counting == 0:
             self.logger.warning("It is not avaiable addressing by hardware")
-            return None
-
-        elif abs(counting - 1953) < 50:
-            addr = 7
+            return(None)
 
         else:
-            addr = int(round(log(self.clk_default / counting) / log(2), 0))
+            addr = int(round(log(self.clk_default/counting)/log(2), 0))
 
         self.logger.info("Board Address is {}".format(addr))
-        return addr
+        return(addr)
+
+
+    def check24V(self):
+        
+        for channel in [self.CH2, self.CH4]:
+            GPIO.output(channel, GPIO.HIGH)
+           
+        for channel in [self.CH1, self.CH3]:
+            GPIO.output(channel, GPIO.LOW)
+            
+        Init()
+        counting = sum(Counting(1)[6:])
+        Close()
+
+        status = abs(counting - 100000) < 10000
+
+        self.logger.info("+24Vdc Available status: {}".format(status))
+        return(status)
 
 class simar_addr:
     def __init__(self):

@@ -35,8 +35,8 @@ class AutoConfig:
         if self.get_subnet() in CONFIGURED_SUBNETS:
             # COUNTINGPRU
             if self.boardID == COUNTINGPRU_SIMAR_ID:
-                self.simar = simar_addr()
-                self.counter = countingPRU_addr()
+                self.simar = Simar_addr()
+                self.counter = CountingPRU_addr()
 
                 if self.simar.IsSimar():
                     for i in range(5):

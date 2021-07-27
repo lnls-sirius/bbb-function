@@ -16,7 +16,7 @@ from serial import Serial, STOPBITS_TWO, SEVENBITS, PARITY_EVEN
 from persist import persist_info
 from consts import *
 from logger import get_logger
-from counters_addr import Addressing
+from boards_addr import *
 
 sys.path.append(os.path.join(os.path.dirname(os.path.realpath(__file__)), "../../../"))
 from bbb import Type
@@ -83,7 +83,7 @@ def counting_pru():
     """
     logger.debug("Counting PRU")
     if PRUserial485_address() != 21 and not os.path.exists(PORT):
-        counters = Addressing()
+        counters = CountingPRU_addr()
         os.system("/root/counting-pru/src/DTO_CountingPRU.sh")
         persist_info(
             Type.COUNTING_PRU,

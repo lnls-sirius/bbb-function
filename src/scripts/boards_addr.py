@@ -10,7 +10,7 @@ def update_file(file_path="./", value=""):
         address.write(str(value) + "\n")
         address.close()
 
-class coutingPRU_addr:
+class CountingPRU_addr:
     def __init__(self, clock = 5e5):
 
         self.clk_default = clock
@@ -89,7 +89,7 @@ class coutingPRU_addr:
         self.logger.info("+24Vdc Available status: {}".format(status))
         return(status)
 
-class simar_addr:
+class Simar_addr:
     def __init__(self):
         self.logger = logging.getLogger()
         self.logger.info("Checking Board Address - SIMAR")

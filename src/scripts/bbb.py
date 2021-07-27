@@ -380,7 +380,8 @@ class Sector:
                     if ip_address in s.hosts():
                         return Sector.SECTORS[idx]
             elif ip_address in subnet.hosts():
-                return Sector.SECTORS[idx]
+                if idx < len(Sector.SECTORS):
+                    return Sector.SECTORS[idx]
 
         return Sector.SECTORS[-1]
 

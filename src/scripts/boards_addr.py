@@ -100,7 +100,7 @@ class Simar_addr:
             GPIO.setup(pin, GPIO.IN)
 
     def autoConfig_Available(self):
-        '''If both addr 4 and addr 3 are TRUE, autoConfig are available'''
+        '''If both addr 4 and addr 3 are TRUE, autoConfig is available'''
 
         return(GPIO.input("P9_41") == 1 and GPIO.input("P9_23") == 1)
 

@@ -14,7 +14,7 @@ logger = get_logger("dhcpConfig")
 
 LED_PIN = "P8_28"
 
-COUNTINGPRU_ADDRESS = 0
+COUNTINGPRU_SIMAR_ADDRESS = 0
 SERIALXXCON_ADDRESS = 21
 
 
@@ -57,7 +57,7 @@ if __name__ == "__main__":
     # Apply DHCP config if needed
     # ----------------------------------
     # COUNTINGPRU, SIMAR
-    if PRUserial485_address() == COUNTINGPRU_ADDRESS:
+    if PRUserial485_address() == COUNTINGPRU_SIMAR_ADDRESS:
         if AUTOCONFIG:
             logger.info("AUTOCONFIG enabled. Configuring DHCP.")
             dhcp()

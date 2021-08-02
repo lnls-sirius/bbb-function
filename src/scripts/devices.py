@@ -65,16 +65,14 @@ def simar():
     logger.debug("Simar")
 
     if not(SPIxCONV):
-        from Adafruit_BBIO import ADC
-        ADC.setup()
-        volts = ADC.read("P9_33") * 1.8
+        simar = Simar_addr()
 
-        if abs(volts*11 - 5) < 0.2:
+        if simar.IsSimar():
             persist_info(
                 Type.SIMAR,
                 0,
                 SIMAR,
-                "Connected: [None]. Auto Configuration: False",#@TODO
+                "Connected: [None]. Auto Configuration: {}".format(simar.autoConfig_Available()),
             )
 
 def counting_pru():

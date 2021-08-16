@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import Adafruit_BBIO.GPIO as GPIO
+import Adafruit_BBIO.UART as UART
 from bbb import BBB
 import serial
 import time
@@ -175,6 +176,7 @@ if __name__ == "__main__":
 
     
     # Config UART
+    UART.setup("UART4")
     s = serial.Serial(port="/dev/ttyO4", baudrate=115200, timeout=TIMEOUT)
 
     # Connect to local redis db

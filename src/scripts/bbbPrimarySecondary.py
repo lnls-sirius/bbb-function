@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import Adafruit_BBIO.GPIO as GPIO
-import Adafruit_BBIO.UART as UART
+
 import sys
 import time
 
@@ -16,8 +16,7 @@ outputPin = "P9_14"
 GPIO.setup(inputPin, GPIO.IN)
 GPIO.setup(outputPin, GPIO.OUT)
 
-# ----- UART Config
-#UART.setup("UART4")
+
 
 if "clean" in sys.argv:
     GPIO.output(outputPin, GPIO.LOW)

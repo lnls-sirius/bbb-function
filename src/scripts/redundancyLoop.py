@@ -126,18 +126,20 @@ def snifferSerial(baudrate):
     conexao=GPIO.input(PIN_FTDI_PRU)
 
     contador=0
-    armazena=b''    
+    armazena=b''  
+#    print("*******************************************************************************")  
         
     if (conexao):
         PRUserial485.PRUserial485_open(6,b'S')
+#        print("*******************************************************************************")
         while True:
             resposta=PRUserial485.PRUserial485_read(1000)
-    #        print(len(resposta))
+#            print(resposta)
             armazena=armazena+resposta
             if (len(armazena)>10000):
-    #            print("*******************************************************************************")
-    #            print(len(armazena))
-    #            print(armazena)
+#                print("*******************************************************************************")
+#                print(len(armazena))
+#                print(armazena)
                 leitura='dados['+str(contador)+']'
                 r.set(leitura,armazena)
                 contador += 1

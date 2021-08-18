@@ -43,6 +43,7 @@ pushd ${FUNCTION_BASE}/src/scripts
     elif [[ ${BBB_STATUS} = "SECONDARY" ]]; then
         # Wait for equipment info - device.json - RES-FILE - BAUDRATE-FILE
         echo "Wait for equipment info..."
+        overlay_PRUserial485
         ./detectEquipment.py --secondary
     fi
 

@@ -5,6 +5,7 @@ import argparse
 import json
 import logging
 import time
+import Adafruit_BBIO.UART as UART
 from serial import Serial
 from os import path, remove
 
@@ -44,6 +45,8 @@ if __name__ == "__main__":
 
     if args.secondary:
         logger.info('Getting configuration from primary BBB...')
+        UART.setup("UART4")
+
         s = Serial(port="/dev/ttyO4", baudrate=115200, timeout=1)
         
         device_info = b''

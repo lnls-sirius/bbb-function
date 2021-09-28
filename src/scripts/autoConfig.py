@@ -19,7 +19,10 @@ logger = get_logger("AutoConfig")
 # Constants
 COUNTINGPRU_ID = 0
 SERIALXXCON_ID = 21
-CONFIGURED_SUBNETS = ["102", "103", "104", "105", "106", "107", "108", "109", "110", "111"]
+CONFIGURED_SUBNETS = ["102", "103", "104", "105", "106", \
+"107", "108", "109", "110", "111", "112",\
+"113", "114", "115", "116", "117", "118", "119", "120", "121", "123", \
+"131", "132", "133", "134", "135", "136", "137"]
 
 
 class AutoConfig:
@@ -106,7 +109,6 @@ if __name__ == "__main__":
 
         # Get devices from this subnet from the ConfigurationTable
         beagles = GetData(datafile=AUTOCONFIG_FILE, subnet=mybbb.currentSubnet)
-
         # Check if current BBB (type and devices found is on ConfigurationTable)
         if beagles.data:
             for bbb in beagles.data[mybbb.type]:
@@ -114,8 +116,12 @@ if __name__ == "__main__":
                 if mybbb.type == "PowerSupply":
                     mybbb.PSnames = []
                     nodes = json.loads(mybbb.node.details.split("\t")[0].split("Names:")[-1].replace("'", '"'))
+
                     for node in nodes:
-                        mybbb.PSnames.extend(node.split("/"))
+                        if "PS model FBP" in mybbb.node.details:
+                            mybbb.PSnames.extend(node.split("/"))
+                        else:
+                            mybbb.PSnames.extend(node.split(","))
 
                     if any(psname in bbb[DEVICE_NAME_COLUMN] for psname in mybbb.PSnames):
                         mybeagle_config = bbb

@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import Adafruit_BBIO.GPIO as GPIO
+import Adafruit_BBIO.UART as UART
 from bbb import BBB
 import serial
 import time
@@ -11,12 +12,15 @@ import argparse
 from logger import get_logger
 import threading
 import subprocess
+import PRUserial485
+
 
 global errorStatus
 STREAMING_LOOP = 2 # seconds
 TIMEOUT = 0.5
 ERROR_DELAY = 10 # seconds
 LED = "P8_28"
+PIN_FTDI_PRU="P8_11"
 streamDelayFactor = {"primary": 1, "secondary": 2}
 
 def blinkLED(mode):
@@ -117,6 +121,39 @@ def pingPrimary(mode):
         time.sleep(0.5)
 
 
+def snifferSerial(baudrate):
+    GPIO.setup(PIN_FTDI_PRU,GPIO.IN)
+    conexao=GPIO.input(PIN_FTDI_PRU)
+
+    contador=0
+    armazena=b''  
+#    print("*******************************************************************************")  
+        
+    if (conexao):
+        PRUserial485.PRUserial485_open(6,b'S')
+#        print("*******************************************************************************")
+        while True:
+            resposta=PRUserial485.PRUserial485_read(1000)
+#            print(resposta)
+            armazena=armazena+resposta
+            if (len(armazena)>10000):
+#                print("*******************************************************************************")
+#                print(len(armazena))
+#                print(armazena)
+                leitura='dados['+str(contador)+']'
+                r.set(leitura,armazena)
+                contador += 1
+                if (contador==10):
+                    contador=0
+                armazena=b''
+    else:
+        s = serial.Serial("/dev/ttyUSB0", 115200, timeout=1)
+        while True:
+            resposta=s.readline()
+    #        print(resposta)
+
+
+
 
 if __name__ == "__main__":
 
@@ -139,8 +176,9 @@ if __name__ == "__main__":
         )
     args = parser.parse_args()
 
-    '''
+    
     # Config UART
+    UART.setup("UART4")
     s = serial.Serial(port="/dev/ttyO4", baudrate=115200, timeout=TIMEOUT)
 
     # Connect to local redis db
@@ -149,7 +187,7 @@ if __name__ == "__main__":
     r.hset("device", "redundancy_epoch", time.time())
     r.hset("device", "matching_ip_address", "")
     r.hset("device", "matching_bbb", "")
-    '''
+    
 
     # Config LED
     GPIO.setup(LED, GPIO.OUT)
@@ -164,16 +202,18 @@ if __name__ == "__main__":
 
     # Continuous loop - Threads
     blinkThread = threading.Thread(target=blinkLED, args=[args.mode], daemon=True)
-    #streamThread = threading.Thread(target=streamInfo, args=[args.mode, time.time()], daemon=True)
-    #infoThread  = threading.Thread(target=getInfo, args=[args.mode, time.time()], daemon=True)
+    streamThread = threading.Thread(target=streamInfo, args=[args.mode, time.time()], daemon=True)
+    infoThread  = threading.Thread(target=getInfo, args=[args.mode, time.time()], daemon=True)
     if args.mode == "secondary":
         pingThread  = threading.Thread(target=pingPrimary, args=[args.mode], daemon=True)
+        snifferThread = threading.Thread(target=snifferSerial, args=[6], daemon=True)
 
     blinkThread.start()
-    #streamThread.start()
-    #infoThread.start()
+    streamThread.start()
+    infoThread.start()
     if args.mode == "secondary":
         pingThread.start()
+        snifferThread.start()
 
     while True:
         time.sleep(1)

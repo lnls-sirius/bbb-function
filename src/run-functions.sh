@@ -2,8 +2,8 @@
 
 export FUNCTION_BASE=/root/bbb-function
 export PYTHONPATH=${FUNCTION_BASE}
-export RSYNC_SERVER="10.128.255.5"
-sed -i -e 's/RSYNC_SERVER.*$/RSYNC_SERVER="10.128.255.5"/' /root/.bashrc
+export RSYNC_SERVER="10.128.114.161"
+sed -i -e 's/RSYNC_SERVER.*$/RSYNC_SERVER="10.128.114.161"/' /root/.bashrc
 export RSYNC_LOCAL="/root"
 export RSYNC_PORT="873"
 

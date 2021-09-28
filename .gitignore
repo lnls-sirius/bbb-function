@@ -3,3 +3,5 @@
 *.toml
 src/scripts/__pycache__/*
 *.swp
+*.save
+*~lock*

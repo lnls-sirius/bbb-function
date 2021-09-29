@@ -61,9 +61,9 @@ if __name__ == "__main__":
         simar = Simar_addr()
 
         if simar.IsSimar():
-            for pin in ["P9_41", "P9_23"]:
+            for pin in ["P9_25", "P9_26"]:
                 GPIO.setup(pin, GPIO.IN)
-            if (GPIO.input("P9_41") == 1 and GPIO.input("P9_23") == 0):
+            if (GPIO.input("P9_25") == 1 and GPIO.input("P9_26") == 0):
                 logger.info("SIMAR red switches on DHCP position. Configuring DHCP.")
                 dhcp()
                 

@@ -62,7 +62,7 @@ class CountingPRU_addr:
         Close()
 
         if counting == 0:
-            self.logger.warning("It is not avaiable addressing by hardware")
+            self.logger.warning("It is not available addressing by hardware")
             return(None)
 
         else:

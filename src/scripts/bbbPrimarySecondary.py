@@ -1,6 +1,7 @@
 #!/usr/bin/python-sirius
 # -*- coding: utf-8 -*-
 
+from PRUserial485 import PRUserial485_address
 import Adafruit_BBIO.GPIO as GPIO
 
 import sys
@@ -9,6 +10,11 @@ import time
 # ----- CONSTANTS
 PRIMARY = 1
 SECONDARY = 2
+SERIALXXCON_ID = 21
+
+#Just for SerialxxCON
+if PRUserial485_address() != SERIALXXCON_ID:
+    exit(PRIMARY)
 
 # ----- GPIO PINS
 inputPin = "P9_12"

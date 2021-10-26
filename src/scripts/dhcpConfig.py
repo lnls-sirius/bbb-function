@@ -8,13 +8,13 @@ import Adafruit_BBIO.GPIO as GPIO
 from PRUserial485 import PRUserial485_address
 from logger import get_logger
 from autoConfig import AutoConfig
-from counters_addr import Addressing # Do not remove
+from boards_addr import *
 
 logger = get_logger("dhcpConfig")
 
 LED_PIN = "P8_28"
 
-COUNTINGPRU_ADDRESS = 0
+COUNTINGPRU_SIMAR_ADDRESS = 0
 SERIALXXCON_ADDRESS = 21
 
 
@@ -56,8 +56,17 @@ if __name__ == "__main__":
     # ----------------------------------
     # Apply DHCP config if needed
     # ----------------------------------
-    # COUNTINGPRU
-    if PRUserial485_address() == COUNTINGPRU_ADDRESS:
+    # COUNTINGPRU, SIMAR
+    if PRUserial485_address() == COUNTINGPRU_SIMAR_ADDRESS:
+        simar = Simar_addr()
+
+        if simar.IsSimar():
+            for pin in ["P9_25", "P9_26"]:
+                GPIO.setup(pin, GPIO.IN)
+            if (GPIO.input("P9_25") == 1 and GPIO.input("P9_26") == 0):
+                logger.info("SIMAR red switches on DHCP position. Configuring DHCP.")
+                dhcp()
+                
         if AUTOCONFIG:
             logger.info("AUTOCONFIG enabled. Configuring DHCP.")
             dhcp()

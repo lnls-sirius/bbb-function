@@ -16,6 +16,7 @@ AGILENT4UHV = environ.get("AGILENT4UHV")
 MKS937B = environ.get("MKS937B")
 SPIXCONV = environ.get("SPIXCONV")
 NOTTY = environ.get("NOTTY")
+SIMAR = environ.get("SIMAR")
 
 SERVER_IP = "10.128.255.5"
 #SERVER_IP = "10.0.6.69"
@@ -39,6 +40,7 @@ Device_Type = {
     5: "4UHV",
     6: "MKS",
     7: "SPIxCONV",
+    8: "Simar",
 }
 
 

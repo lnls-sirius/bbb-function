@@ -16,13 +16,16 @@ from serial import Serial, STOPBITS_TWO, SEVENBITS, PARITY_EVEN
 from persist import persist_info
 from consts import *
 from logger import get_logger
-from counters_addr import Addressing
+from boards_addr import *
 
 sys.path.append(os.path.join(os.path.dirname(os.path.realpath(__file__)), "../../../"))
 from bbb import Type
 
 
 SPIxCONV = False
+
+logger = get_logger("Devices")
+
 
 if os.path.exists("/root/SPIxCONV/software/scripts"):
     sys.path.append("/root/SPIxCONV/software/scripts")
@@ -47,7 +50,6 @@ RS485 = 1
 GPIO.setup(PIN_FTDI_PRU, GPIO.IN)
 GPIO.setup(PIN_RS232_RS485, GPIO.IN)
 
-logger = get_logger("Devices")
 
 
 def reset():
@@ -56,6 +58,22 @@ def reset():
     """
     persist_info(0, 0, "RESET", "Searching for connected equipments.")
 
+def simar():
+    """
+    Simar
+    """
+    logger.debug("Simar")
+
+    if not(SPIxCONV):
+        simar = Simar_addr()
+
+        if simar.IsSimar():
+            persist_info(
+                Type.SIMAR,
+                0,
+                SIMAR,
+                "Connected: [{}]. Auto Configuration: {}".format(simar.addr(), simar.autoConfig_Available()),
+            )
 
 def counting_pru():
     """
@@ -63,7 +81,7 @@ def counting_pru():
     """
     logger.debug("Counting PRU")
     if PRUserial485_address() != 21 and not os.path.exists(PORT):
-        counters = Addressing()
+        counters = CountingPRU_addr()
         os.system("/root/counting-pru/src/DTO_CountingPRU.sh")
         persist_info(
             Type.COUNTING_PRU,

@@ -9,7 +9,7 @@ from xlrd import open_workbook
 from consts import *
 from bbb import BBB
 from logger import get_logger
-from counters_addr import Addressing
+from boards_addr import *
 from PRUserial485 import PRUserial485_address
 from os import system
 from time import sleep
@@ -17,7 +17,7 @@ from time import sleep
 logger = get_logger("AutoConfig")
 
 # Constants
-COUNTINGPRU_ID = 0
+COUNTINGPRU_SIMAR_ID = 0
 SERIALXXCON_ID = 21
 CONFIGURED_SUBNETS = ["102", "103", "104", "105", "106", \
 "107", "108", "109", "110", "111", "112",\
@@ -37,14 +37,23 @@ class AutoConfig:
         """
         if self.get_subnet() in CONFIGURED_SUBNETS:
             # COUNTINGPRU
-            if self.boardID == COUNTINGPRU_ID:
-                self.counter = Addressing()
-                system("/root/counting-pru/src/DTO_CountingPRU.sh")
-                for i in range(5):
-                    self.status = self.counter.autoConfig_Available()
-                    if self.status:
-                        break
-                    sleep(2)
+            if self.boardID == COUNTINGPRU_SIMAR_ID:
+                self.simar = Simar_addr()
+                self.counter = CountingPRU_addr()
+
+                if self.simar.IsSimar():
+                    for i in range(5):
+                        self.status = self.simar.autoConfig_Available()
+                        if self.status:
+                            break
+                        sleep(2)
+                else:
+                    system("/root/counting-pru/src/DTO_CountingPRU.sh")
+                    for i in range(5):
+                        self.status = self.counter.autoConfig_Available()
+                        if self.status:
+                            break
+                        sleep(2)
 
             # SERIALxxCON - AUTOCONFIG: RTS and CTS pins tied together (jumper)
             elif self.boardID == SERIALXXCON_ID:

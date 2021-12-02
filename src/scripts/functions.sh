@@ -272,3 +272,8 @@ function socat_devices {
     echo  "Starting socat..."
     socat TCP-LISTEN:${SOCAT_PORT},reuseaddr,fork,nodelay FILE:${SOCAT_DEVICE},b${BAUDRATE},rawer&
 }
+
+function simar {
+    echo "Starting SIMAR..."
+    /root/simar-software/start/simar_startup.sh
+}

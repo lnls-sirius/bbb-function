@@ -60,7 +60,7 @@ if __name__ == "__main__":
     if PRUserial485_address() == COUNTINGPRU_SIMAR_ADDRESS:
         simar = Simar_addr()
 
-        if simar.IsSimar():
+        if Simar_addr.check():
             for pin in ["P9_25", "P9_26"]:
                 GPIO.setup(pin, GPIO.IN)
             if (GPIO.input("P9_25") == 1 and GPIO.input("P9_26") == 0):

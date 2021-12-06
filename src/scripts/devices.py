@@ -66,7 +66,7 @@ def simar():
     logger.debug("Simar")
     simar = Simar_addr()
 
-    if simar.IsSimar():
+    if Simar_addr.check():
         sensor_type = { 0x58: "BMP280", 0x60: "BME280" }
         sensors = []
 

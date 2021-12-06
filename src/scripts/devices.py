@@ -64,35 +64,34 @@ def simar():
     Simar
     """
     logger.debug("Simar")
+    simar = Simar_addr()
 
-    if not(SPIxCONV):
-        simar = Simar_addr()
+    if simar.IsSimar():
+        sensor_type = { 0x58: "BMP280", 0x60: "BME280" }
+        sensors = []
 
-        if simar.IsSimar():
-            sensor_type = { 0x58: "BMP280", 0x60: "BME280" }
-            sensors = []
+        GPIO.setup(PIN_SIMAR_LSB, GPIO.OUT)
+        GPIO.setup(PIN_SIMAR_MSB, GPIO.OUT)
 
-            GPIO.setup(PIN_SIMAR_LSB, GPIO.OUT)
-            GPIO.setup(PIN_SIMAR_MSB, GPIO.OUT)
+        for i in range(0,4):
+            GPIO.output(PIN_SIMAR_LSB, GPIO.HIGH if (i >> 1) & 1 else GPIO.LOW)
+            GPIO.output(PIN_SIMAR_MSB, GPIO.HIGH if (i >> 0) & 1 else GPIO.LOW)
+            for addr in ["0x76", "0x77"]:
+                try:
+                    # Using check_output for backwards compatibility
+                    sensor_reply = int(subprocess.check_output(["i2cget", "-y", "2", addr, "0xD0"]), 16)
 
-            for i in range(0,4):
-                GPIO.output(PIN_SIMAR_LSB, GPIO.HIGH if (i >> 1) & 1 else GPIO.LOW)
-                GPIO.output(PIN_SIMAR_MSB, GPIO.HIGH if (i >> 0) & 1 else GPIO.LOW)
-                for addr in ["0x76", "0x77"]:
-                    try:
-                        sensor_reply = int(subprocess.run(["i2cget", "-y", "2", addr, "0xD0"], capture_output=True, text=True).stdout, 16)
+                    if sensor_reply:
+                        sensors.append("{} - Ch. {} ({})".format(sensor_type[sensor_reply], i, addr))
+                except (subprocess.CalledProcessError, KeyError, ValueError, TypeError):
+                    pass
 
-                        if sensor_reply:
-                            sensors.append("{} - Ch. {} ({})".format(sensor_type[sensor_reply], i, addr))
-                    except (subprocess.CalledProcessError, KeyError, ValueError):
-                        pass
-
-            persist_info(
-                Type.SIMAR,
-                0,
-                SIMAR,
-                "Connected: [{}]. Auto Configuration: {}. Sensors: [{}]".format(simar.addr(), simar.autoConfig_Available(), ", ".join(sensors))
-            )
+        persist_info(
+            Type.SIMAR,
+            0,
+            SIMAR,
+            "Connected: [{}]. Auto Configuration: {}. Sensors: [{}]".format(simar.addr(), simar.autoConfig_Available(), ", ".join(sensors))
+        )
 
 def counting_pru():
     """

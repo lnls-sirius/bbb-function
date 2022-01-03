@@ -41,7 +41,7 @@ class AutoConfig:
                 self.simar = Simar_addr()
                 self.counter = CountingPRU_addr()
 
-                if self.simar.IsSimar():
+                if Simar_addr.check():
                     for i in range(5):
                         self.status = self.simar.autoConfig_Available()
                         if self.status:

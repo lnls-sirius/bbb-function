@@ -111,7 +111,8 @@ class Simar_addr:
 
         return(addressing)
 
-    def IsSimar(self):
+    @staticmethod
+    def check():
         from Adafruit_BBIO import ADC
         ADC.setup()
         volts = ADC.read("P9_33") * 1.8
@@ -120,6 +121,6 @@ class Simar_addr:
 
 if __name__ == "__main__":
     simar = Simar_addr()
-    print(f"Is Simar? {simar.IsSimar()}\
+    print(f"Is Simar? {Simar_addr.check()}\
             Addressing: {simar.addr()}\
             AutoConfig: {simar.autoConfig_Available()}")

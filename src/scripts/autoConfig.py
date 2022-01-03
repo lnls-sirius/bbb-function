@@ -215,11 +215,11 @@ if __name__ == "__main__":
             try:
                 # Get previous config
                 with open(CONFIG_FILE, "r") as fp:
-                    file_config = json.loads(mybeagle_config, fp)
-
+                    mybeagle_config = json.load(fp)
+                    
                 # Configure hostname
-                logger.info("BBB hostname: {}".format(file_config[BBB_HOSTNAME_COLUMN]))
-                mybbb.update_hostname(file_config[BBB_HOSTNAME_COLUMN])
+                logger.info("BBB hostname: {}".format(mybeagle_config[BBB_HOSTNAME_COLUMN]))
+                mybbb.update_hostname(mybeagle_config[BBB_HOSTNAME_COLUMN])
 
                 # If same subnet and desided IP is available, proceed with IP configuration
                 # Check primary IP

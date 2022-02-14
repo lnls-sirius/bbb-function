@@ -17,6 +17,8 @@ from persist import persist_info
 from consts import *
 from logger import get_logger
 from boards_addr import *
+import json
+from datetime import datetime
 import Adafruit_BBIO.SPI as SPI
 
 sys.path.append(os.path.join(os.path.dirname(os.path.realpath(__file__)), "../../../"))
@@ -106,7 +108,7 @@ def simar():
                 info += chr(rec)
                 address += 1
             if info:
-                boards.append("{}, 'Board Address': {} }}". format(info[:-1], board_addr))
+                boards.append({**json.loads(info), **{"address": board_addr}})
 
         sensor_type = { 0x58: "BMP280", 0x60: "BME280" }
         sensors = []
@@ -127,12 +129,19 @@ def simar():
                 except (subprocess.CalledProcessError, KeyError, ValueError, TypeError):
                     pass
 
-        persist_info(
-            Type.SIMAR,
-            0,
-            SIMAR,
-            "Connected: [{}]. Auto Configuration: {}. Sensors: [{}]. Boards: [{}]".format(simar.addr(), simar.autoConfig_Available(), ", ".join(sensors), ",".join(boards))
-        )
+        key_list = list(Device_Type.keys())
+        val_list = list(Device_Type.values())
+
+        file = open(RES_FILE, "w+")
+        file.writelines("SIMAR")
+        file.close()
+
+        file = open(DEVICE_JSON, "w+")
+        file.writelines(json.dumps({"device": key_list[val_list.index("Simar")], "sensors": sensors, "details": "SIMAR - ", "baudrate": 0, "boards":boards, "time": str(datetime.now())})+"\n")
+        file.close()
+
+        exit(0)
+
 
 def counting_pru():
     """

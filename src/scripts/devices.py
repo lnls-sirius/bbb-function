@@ -70,7 +70,7 @@ def simar():
     """
     Simar
     """
-    logger.debug("Simar")
+    logger.debug("SIMAR")
     simar = Simar_addr()
 
     if Simar_addr.check():
@@ -137,7 +137,7 @@ def simar():
         file.close()
 
         file = open(DEVICE_JSON, "w+")
-        file.writelines(json.dumps({"device": key_list[val_list.index("Simar")], "sensors": sensors, "details": "SIMAR - ", "baudrate": 0, "boards":boards, "time": str(datetime.now())})+"\n")
+        file.writelines(json.dumps({"device": key_list[val_list.index("SIMAR")], "sensors": sensors, "details": "SIMAR - Connected: [{}]".format(simar.addr()), "baudrate": 0, "boards":boards, "time": str(datetime.now())})+"\n")
         file.close()
 
         exit(0)

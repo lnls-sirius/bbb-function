@@ -94,7 +94,7 @@ class Simar_addr:
         self.logger = logging.getLogger()
         self.logger.info("Checking Board Address - SIMAR")
 
-        self.addr_pins = ["P9_41", "P9_23", "P9_24", "P9_25", "P9_26"]
+        self.addr_pins = ["P9_26", "P9_25", "P9_41", "P9_23", "P9_24"]
 
         for pin in self.addr_pins:
             GPIO.setup(pin, GPIO.IN)

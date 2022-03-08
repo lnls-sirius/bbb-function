@@ -40,7 +40,7 @@ Device_Type = {
     5: "4UHV",
     6: "MKS",
     7: "SPIxCONV",
-    8: "Simar",
+    8: "SIMAR",
 }
 
 

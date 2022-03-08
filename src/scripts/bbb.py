@@ -484,7 +484,7 @@ class Type:
         elif self.code == Type.MKS937B:
             return "Desc: MKS 937b"
         elif self.code == Type.SIMAR:
-            return "Desc: Simar"
+            return "Desc: SIMAR"
         elif self.code == Type.SPIXCONV:
             return "Desc: SPIxCONV"
         else:

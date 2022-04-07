@@ -271,7 +271,7 @@ def mks9376b():
             if len(res) != 0:
                 devices.append(mks_addr)
         ser.close()
-        name = "MBTemp"
+        name = "MKS"
         if len(devices):
             persist_info(Type.MKS937B, name,baud, MKS937B, "MKS937Bs connected {}".format(devices))
 
@@ -382,7 +382,7 @@ def spixconv():
                             
                         )
                     )
-            persist_info(Type.SPIXCONV,  name, spi_addr, SPIXCONV, "SPIXCONV connected {}".format(spi_addr))
+                    persist_info(Type.SPIXCONV,  name, spi_addr, SPIXCONV, "SPIXCONV connected {}".format(spi_addr))
 
     
 

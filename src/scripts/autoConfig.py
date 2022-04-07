@@ -149,7 +149,7 @@ if __name__ == "__main__":
                     if any(psname in bbb[DEVICE_NAME_COLUMN] for psname in mybbb.PSnames):
                         mybeagle_config = bbb
 
-                if mybbb.type == "SPIxCONV" and mybbb.name == bbb[DEVICE_NAME_COLUMN]:
+                if( mybbb.type == "SPIxCONV" and mybbb.name == bbb[DEVICE_NAME_COLUMN]):
                      mybeagle_config = bbb
         
                 # If not PowerSupply, check IDs

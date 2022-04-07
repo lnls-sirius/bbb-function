@@ -1,29 +1,28 @@
 
 #!/usr/bin/python-sirius
 import logging
+from operator import add
 import time
 import os
 import subprocess
 import sys
 import struct
+import json
+#from openpyxl import load_workbook
+
 import Adafruit_BBIO.GPIO as GPIO
-from PRUserial485 import (
-    PRUserial485_open,
-    PRUserial485_write,
-    PRUserial485_read,
-    PRUserial485_address,
-)
+import PRUserial485
+    
 from serial import Serial, STOPBITS_TWO, SEVENBITS, PARITY_EVEN
 from persist import persist_info
 from consts import *
 from logger import get_logger
-from boards_addr import *
-import json
-from datetime import datetime
-import Adafruit_BBIO.SPI as SPI
+from counters_addr import Addressing
+
 
 sys.path.append(os.path.join(os.path.dirname(os.path.realpath(__file__)), "../../../"))
 from bbb import Type
+
 
 SPIxCONV = False
 
@@ -53,53 +52,11 @@ GPIO.setup(PIN_RS232_RS485, GPIO.IN)
 logger = get_logger("Devices")
 
 
-
-
-# Checks  if flash memory  is mounted 
-def pendrive():
-    p = subprocess.run(['lsblk'],stdout= subprocess.PIPE)
-    stdout = p.stdout
-    return stdout.decode('ISO-8859-1') if p.returncode == 0 else ''
-
-#Mount pendrive
-def mount_pendrive():
-    p  = subprocess.run(['mount','/dev/sda1','/mnt/USB'],stdout = subprocess.PIPE)
-    stdout = p.stdout
-    return stdout.decode('ISO-8859-1') if p.returncode == 0 else ''
-
-
-#Checks flash memory  is connected
-def check_devices():
-    p = subprocess.run(['ls','/dev'],stdout = subprocess.PIPE)
-    stdout = p.stdout
-    return  stdout.decode('ISO-8859-1') if p.returncode == 0 else ''
-
-# Checks what kind of file this in the flash memory
-def read_pendrive():
-    p = subprocess.run(['ls','/mnt/USB'],stdout= subprocess.PIPE)
-    stdout = p.stdout
-    return stdout.decode('ISO-8859-1') if p.returncode == 0 else ''
-
-#Finds name service and changes ip 
-def get_name_service():
-    p = subprocess.run(['connmanctl', 'services'], stdout=subprocess.PIPE)
-    stdout  = p.stdout
-    return stdout.decode('ISO-8859-1') if p.returncode == 0 else ''
-
-def change_ip(service,new_ip,mask,gateway):
-    p = subprocess.run(['connmanctl','config',service,'--ipv4','manual',new_ip,mask,gateway],stdout = subprocess.PIPE)
-
-    name_service = get_name_service()
-    service_n =  name_service.split(" ")
-    service = service_n[17][:-1]
-    change_ip(service,new_ip,mask,gateway)
-
-
 def reset():
     """
     Reset device.json content.
     """
-    persist_info(0, 0, " ","RESET", "Searching for connected equipments.")
+    persist_info(0, 0, "RESET", "Searching for connected equipments.")
 
 
 def counting_pru():
@@ -110,10 +67,8 @@ def counting_pru():
     if PRUserial485_address() != 21 and not os.path.exists(PORT):
         counters = Addressing()
         os.system("/root/counting-pru/src/DTO_CountingPRU.sh")
-        name = "Counting PRU"
         persist_info(
             Type.COUNTING_PRU,
-            name,
             0,
             COUNTING_PRU,
             "Connected: [{}]. Auto Configuration: {}".format(counters.addr(), counters.autoConfig_Available()),
@@ -125,9 +80,8 @@ def no_tty():
     NO /dev/ttyUSB0
     """
     logger.debug("No /dev/ttyUSB0")
-    name = "No TTY"
     if not os.path.exists(PORT) and PRUserial485_address() == 21:
-        persist_info(Type.UNDEFINED, name,115200, NOTTY)
+        persist_info(Type.UNDEFINED, 115200, NOTTY)
 
 
 def power_supply_pru():
@@ -168,12 +122,10 @@ def power_supply_pru():
                 ps_name = getPSnames(ps_addr).replace(" ", "")
                 if not ps_name in ps_names:
                     ps_names.append(ps_name)
-                    name = "Power Supply"
             time.sleep(0.1)
         # Save info
         persist_info(
             Type.POWER_SUPPLY,
-            name,
             6000000,
             PRU_POWER_SUPPLY,
             "PS model {}. Connected: {}. Names: {}".format(ps_model, devices, ps_names),
@@ -208,10 +160,9 @@ def thermo_probe():
         ser.reset_output_buffer()
         ser.write(msg.encode("utf-8"))
         res = ser.read(50)
-        name = "Thermo Probes"
 
         if len(res) != 0:
-            persist_info(Type.SERIAL_THERMO,name, baud, SERIAL_THERMO)
+            persist_info(Type.SERIAL_THERMO, baud, SERIAL_THERMO)
 
 
 def BSMPChecksum(string):
@@ -237,7 +188,7 @@ def getPSnames(ps_ID):
 
 
 def mbtemp():
-
+    print("entrei aqui")
     """
     MBTemp
     """
@@ -257,9 +208,9 @@ def mbtemp():
             if len(res) == 7 and res[1] == "\x11":
                 devices.append(mbt_addr)
         ser.close()
-        name = "MBTemp"
+        print("cheguei aq")
         if len(devices):
-            persist_info(Type.MBTEMP, name, baud, MBTEMP, "MBTemps connected {}".format(devices))
+            persist_info(Type.MBTEMP, baud, MBTEMP, "MBTemps connected {}".format(devices))
 
                     
 
@@ -286,9 +237,8 @@ def mks9376b():
             if len(res) != 0:
                 devices.append(mks_addr)
         ser.close()
-        name = "MBTemp"
         if len(devices):
-            persist_info(Type.MKS937B, name,baud, MKS937B, "MKS937Bs connected {}".format(devices))
+            persist_info(Type.MKS937B, baud, MKS937B, "MKS937Bs connected {}".format(devices))
 
 
 def Agilent4UHV_CRC(string):
@@ -334,9 +284,8 @@ def agilent4uhv():
             if len(res) != 0:
                 devices.append(addr)
         ser.close()
-        name = "Agilent 4UHV"
         if len(devices):
-            persist_info(Type.AGILENT4UHV, name ,baud, AGILENT4UHV, "AGILENT4UHV connected {}".format(devices))
+            persist_info(Type.AGILENT4UHV, baud, AGILENT4UHV, "AGILENT4UHV connected {}".format(devices))
 
 
 def spixconv():
@@ -357,6 +306,48 @@ def spixconv():
     subprocess.call("config-pin P9_24 gpio", shell=True)  # LDAC / CNVST
     subprocess.call("config-pin P9_26 gpio", shell=True)  # RS
 
+
+
+    # Checks  if flash memory  is mounted 
+def pendrive():
+    p = subprocess.run(['lsblk'],stdout= subprocess.PIPE)
+    stdout = p.stdout
+    return stdout.decode('ISO-8859-1') if p.returncode == 0 else ''
+
+#Mount pendrive
+def mount_pendrive():
+    p  = subprocess.run(['mount','/dev/sda1','/mnt/USB'],stdout = subprocess.PIPE)
+    stdout = p.stdout
+    return stdout.decode('ISO-8859-1') if p.returncode == 0 else ''
+
+
+#Checks flash memory  is connected
+def check_devices():
+    p = subprocess.run(['ls','/dev'],stdout = subprocess.PIPE)
+    stdout = p.stdout
+    return  stdout.decode('ISO-8859-1') if p.returncode == 0 else ''
+
+# Checks what kind of file this in the flash memory
+def read_pendrive():
+    p = subprocess.run(['ls','/mnt/USB'],stdout= subprocess.PIPE)
+    stdout = p.stdout
+    return stdout.decode('ISO-8859-1') if p.returncode == 0 else ''
+
+#Finds name service and changes ip 
+def get_name_service():
+    p = subprocess.run(['connmanctl', 'services'], stdout=subprocess.PIPE)
+    stdout  = p.stdout
+    return stdout.decode('ISO-8859-1') if p.returncode == 0 else ''
+
+def change_ip(service,new_ip,mask,gateway):
+    p = subprocess.run(['connmanctl','config',service,'--ipv4','manual',new_ip,mask,gateway],stdout = subprocess.PIPE)
+
+    name_service = get_name_service()
+    service_n =  name_service.split(" ")
+    service = service_n[17][:-1]
+    change_ip(service,new_ip,mask,gateway)
+
+
     # Starts checking  for a flash memory
     find_devices =  check_devices()
 
@@ -365,7 +356,7 @@ def spixconv():
         exit()
 
     else:
-        print("Pendrive detected")
+
         devices = pendrive()
         result = devices.find('/mnt/USB')
 
@@ -373,6 +364,8 @@ def spixconv():
             mount_pendrive()
 
         pendrive_files  = read_pendrive()
+
+
 
         if(pendrive_files.find('AutoConfig.xlsx') == -1 and pendrive_files.find('AutoConfig.txt') == -1):
             print("No files detected")
@@ -384,22 +377,31 @@ def spixconv():
             print(bbb[0])
             name = bbb[0]
 
-            for addr in range(0, 255):
-                if flash.ID_read(addr) == 4:
-                    spi_addr = 8 if flash.address_read(addr) == 0 else flash.address_read(addr)
-                    logger.info(
-                        "Addr code: {}\nSelection Board ID: {}\nFlash address: {}\n Name {}\nSPI address: {}".format(
-                            addr,
-                            selection.board_ID(addr),
-                            flash.address_read(addr),
-                            name,
-                            spi_addr,
-                            
-                        )
+        for addr in range(0, 255):
+            if flash.ID_read(addr) == 4:
+                spi_addr = 8 if flash.address_read(addr) == 0 else flash.address_read(addr)
+                logger.info(
+                    "Addr code: {}\nSelection Board ID: {}\nFlash address: {}\n Name {}\nSPI address: {}".format(
+                        addr,
+                        selection.board_ID(addr),
+                        flash.address_read(addr),
+                        name,
+                        spi_addr,
+                        
                     )
-            persist_info(Type.SPIXCONV,  name, spi_addr, SPIXCONV, "SPIXCONV connected {}".format(spi_addr))
+                )
+                persist_info(Type.SPIXCONV,  name, spi_addr, SPIXCONV, "SPIXCONV connected {}".format(spi_addr))
 
-    
+        #else:
+         #   wb = load_workbook('mnt/USB/AutoConfig.xlsx')
+          #  ws = wb.active
+           # new_ip = (ws['A2']).value
+            #mask = (ws['B2']).value	
+           # gateway = (ws['C2']).value
+
+           # print("Changing IP to:")
+           # print(new_ip,mask,gateway)
+
 
         
         

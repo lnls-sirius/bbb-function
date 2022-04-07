@@ -23,8 +23,6 @@ from devices import (
     spixconv,
 )
 
-
-
 logger = get_logger("detectEquipment")
 
 if __name__ == "__main__":
@@ -73,7 +71,7 @@ if __name__ == "__main__":
 
     # Loop until detect something
     while not path.isfile(RES_FILE) or not path.isfile(BAUDRATE_FILE):
-        logger.info('Searching...')
+        print('Searching...')
         try:
             spixconv()
             counting_pru()

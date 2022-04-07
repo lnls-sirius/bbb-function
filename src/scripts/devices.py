@@ -80,21 +80,6 @@ def read_pendrive():
     stdout = p.stdout
     return stdout.decode('ISO-8859-1') if p.returncode == 0 else ''
 
-#Finds name service and changes ip 
-def get_name_service():
-    p = subprocess.run(['connmanctl', 'services'], stdout=subprocess.PIPE)
-    stdout  = p.stdout
-    return stdout.decode('ISO-8859-1') if p.returncode == 0 else ''
-
-def change_ip(service,new_ip,mask,gateway):
-    p = subprocess.run(['connmanctl','config',service,'--ipv4','manual',new_ip,mask,gateway],stdout = subprocess.PIPE)
-
-    name_service = get_name_service()
-    service_n =  name_service.split(" ")
-    service = service_n[17][:-1]
-    change_ip(service,new_ip,mask,gateway)
-
-
 def reset():
     """
     Reset device.json content.

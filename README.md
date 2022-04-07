@@ -46,3 +46,4 @@ Call the script with project name as argument: `./rsync_beaglebone.sh project-na
 - Check if there are updates available for current project
 - If so, update files and rebuild libraries (if needed)
 # teste-pulsados
+# teste-pulsados

@@ -72,7 +72,7 @@ if __name__ == "__main__":
 
     # Loop until detect something
     while not path.isfile(RES_FILE) or not path.isfile(BAUDRATE_FILE):
-        logger.info('Searching...')
+        print('Searching...')
         try:
             simar()
             spixconv()

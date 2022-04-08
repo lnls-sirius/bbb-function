@@ -18,3 +18,6 @@ def get_logger(name, logfile="/var/log/bbbfunction.log"):
     logger.setLevel(logging.INFO)
 
     return logger
+
+
+    

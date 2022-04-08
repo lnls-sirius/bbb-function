@@ -1,5 +1,6 @@
 #!/usr/bin/python-sirius
 # # -*- coding: utf-8 -*-
+from unicodedata import name
 import serial
 import subprocess
 import json
@@ -31,10 +32,15 @@ class AutoConfig:
         self.status = False
         self.check()
 
+    def read_USB0(self):
+            p = subprocess.run(['ls','/dev'],stdout= subprocess.PIPE)
+            stdout = p.stdout
+            return stdout.decode('ISO-8859-1') if p.returncode == 0 else ''
     def check(self):
         """
         Check whether AUTOCONFIG is enabled only for some subnets
         """
+
         if self.get_subnet() in CONFIGURED_SUBNETS:
             # COUNTINGPRU
             if self.boardID == COUNTINGPRU_SIMAR_ID:
@@ -57,12 +63,18 @@ class AutoConfig:
 
             # SERIALxxCON - AUTOCONFIG: RTS and CTS pins tied together (jumper)
             elif self.boardID == SERIALXXCON_ID:
-                for i in range(5):
-                    try:
-                        self.status = serial.Serial("/dev/ttyUSB0").cts
-                    except:
-                        self.status = False
-                        sleep(2)
+                read_usb = self.read_USB0()
+
+                if(read_usb.find('ttyUSB') != -1):
+                    for i in range(5):
+                        try:
+                            self.status = serial.Serial("/dev/ttyUSB0").cts
+                        except:
+                            self.status = False
+                            sleep(2)
+                else:
+                    # Considera SPIxCONV = Pulsados
+                    self.status = True
 
         # Subnet not configured, then:
         else:
@@ -82,7 +94,7 @@ class AutoConfig:
 
 
 class GetData:
-    def __init__(self, datafile=AUTOCONFIG_FILE, subnet=""):
+    def __init__(self,datafile=AUTOCONFIG_FILE, subnet=""):
         try:
             _sheet = open_workbook(datafile).sheet_by_name(subnet)
             keys = [_sheet.cell(0, col_index).value for col_index in range(_sheet.ncols)]
@@ -103,11 +115,11 @@ class GetData:
 
 
 if __name__ == "__main__":
+
     AUTOCONFIG = AutoConfig().status
 
     if AUTOCONFIG:
         mybeagle_config = ""
-
         # Get device.json from whoami.py and get identified equipment
         mybbb = BBB()
 
@@ -118,9 +130,11 @@ if __name__ == "__main__":
 
         # Get devices from this subnet from the ConfigurationTable
         beagles = GetData(datafile=AUTOCONFIG_FILE, subnet=mybbb.currentSubnet)
+
         # Check if current BBB (type and devices found is on ConfigurationTable)
         if beagles.data:
             for bbb in beagles.data[mybbb.type]:
+
                 # If PowerSupply, check their names instead of IDs
                 if mybbb.type == "PowerSupply":
                     mybbb.PSnames = []
@@ -134,6 +148,10 @@ if __name__ == "__main__":
 
                     if any(psname in bbb[DEVICE_NAME_COLUMN] for psname in mybbb.PSnames):
                         mybeagle_config = bbb
+
+                if( mybbb.type == "SPIxCONV" and mybbb.name == bbb[DEVICE_NAME_COLUMN]):
+                     mybeagle_config = bbb
+        
                 # If not PowerSupply, check IDs
                 else:
                     if any(id in bbb[DEVICE_ID_COLUMN] for id in mybbb.ids):
@@ -182,7 +200,7 @@ if __name__ == "__main__":
                     "manual",
                     new_ip_address=new_ip,
                     new_mask="255.255.255.0",
-                    new_gateway="10.128.{}.1".format(subnet),
+                    new_gateway="10.0.{}.1".format(subnet),
                 )
             else:
                 if not (IP_AVAILABLE_1 or IP_AVAILABLE_2):
@@ -272,3 +290,4 @@ if __name__ == "__main__":
                         )
             except:
                 logger.info("BBB configuration not found ! Keeping DHCP")
+

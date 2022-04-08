@@ -7,7 +7,7 @@ from logger import get_logger
 logger = get_logger("Persist")
 
 
-def persist_info(device, baud, exit_code, details="No details."):
+def persist_info(device, name,  baud, exit_code, details="No details."):
     """
     This method persist the information about which device is connected to this sbc.
     The info is stored using the following format:
@@ -26,11 +26,12 @@ def persist_info(device, baud, exit_code, details="No details."):
 
     device_info = {
         "device": device,
+        "name" : name,
         "baudrate": baud,
         "details": str(exit_code) + " -  " + details,
         "time": str(datetime.now())
     }
-
+ 
     logger.info("Device Identified!")
     write_info(DEVICE_JSON, json.dumps(device_info)+"\n")
     exit(0)

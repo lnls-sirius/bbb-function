@@ -130,7 +130,7 @@ if __name__ == "__main__":
 
         # Get devices from this subnet from the ConfigurationTable
         beagles = GetData(datafile=AUTOCONFIG_FILE, subnet=mybbb.currentSubnet)
-        
+
         # Check if current BBB (type and devices found is on ConfigurationTable)
         if beagles.data:
             for bbb in beagles.data[mybbb.type]:

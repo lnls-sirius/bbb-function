@@ -14,7 +14,7 @@ popd
 
 
 # Updating etc folder and bbb-function if rsync server available.
-wait-for-it ${RSYNC_SERVER}:873 --timeout=2
+# wait-for-it ${RSYNC_SERVER}:873 --timeout=2
 if [ $? -eq 0 ]; then
         # Updating bbb-function files
         pushd ${FUNCTION_BASE}/src/scripts/

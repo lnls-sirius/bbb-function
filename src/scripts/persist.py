@@ -22,7 +22,6 @@ def persist_info(device, name,  baud, exit_code, details="No details."):
         write_info(RES_FILE, exit_code)
     if type(baud) != int:
         raise TypeError("baud type is incorrect. ", baud)
-
     write_info(BAUDRATE_FILE, str(baud))
 
     device_info = {
@@ -30,11 +29,11 @@ def persist_info(device, name,  baud, exit_code, details="No details."):
         "name" : name,
         "baudrate": baud,
         "details": str(exit_code) + " -  " + details,
-        "time": str(datetime.now()),
+        "time": str(datetime.now())
     }
  
     logger.info("Device Identified!")
-    write_info(DEVICE_JSON, json.dumps(device_info))
+    write_info(DEVICE_JSON, json.dumps(device_info)+"\n")
     exit(0)
 
 

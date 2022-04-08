@@ -58,8 +58,11 @@ pushd ${FUNCTION_BASE}/src/scripts
     while [ 1 ]
     do
         if [[ ${BBB_STATUS} = "PRIMARY" ]]; then
-            
-            if [[ ${CONN_DEVICE} = "${SPIXCONV}" ]]; then
+
+            if [[ ${CONN_DEVICE} = "${SIMAR}" ]]; then
+                simar
+
+            elif [[ ${CONN_DEVICE} = "${SPIXCONV}" ]]; then
                 # Using variable BAUDRATE to store the board address
                 spixconv ${BAUDRATE}
 

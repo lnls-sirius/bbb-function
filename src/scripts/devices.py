@@ -27,6 +27,9 @@ from bbb import Type
 
 SPIxCONV = False
 
+logger = get_logger("Devices")
+
+
 if os.path.exists("/root/SPIxCONV/software/scripts"):
     sys.path.append("/root/SPIxCONV/software/scripts")
     import init # Do not remove, runs SPI init script
@@ -47,11 +50,15 @@ PIN_RS232_RS485 = "P8_12"  # 0: RS232 / 1: RS485
 RS232 = 0
 RS485 = 1
 
+PIN_SIMAR_DS = "P9_14"
+PIN_SIMAR_LSB = "P9_15"
+PIN_SIMAR_MSB = "P9_16"
+
 GPIO.setup(PIN_FTDI_PRU, GPIO.IN)
 GPIO.setup(PIN_RS232_RS485, GPIO.IN)
 
-logger = get_logger("Devices")
-
+GPIO.setup(PIN_SIMAR_DS, GPIO.OUT)
+GPIO.output(PIN_SIMAR_DS, GPIO.LOW)
 
 
 
@@ -86,6 +93,82 @@ def reset():
     """
     persist_info(0, 0, " ","RESET", "Searching for connected equipments.")
 
+def simar():
+    """
+    Simar
+    """
+    logger.debug("SIMAR")
+    simar = Simar_addr()
+
+    if Simar_addr.check():
+        boards = []
+
+        spi = SPI.SPI(0, 0)
+        spi.bpw = 8
+        spi.lsbfirst = False
+        spi.cshigh = False
+        spi.mode = 3
+        spi.msh = 1000000
+
+        for board_addr in range(0,16):
+            parity = False
+            for char in '{0:04b}'.format(board_addr):
+                if char == "1":
+                    parity = not parity
+
+            GPIO.output(PIN_SIMAR_DS, GPIO.LOW)
+            spi.writebytes([(board_addr << 3) + (1 if parity else 0)])
+            GPIO.output(PIN_SIMAR_DS, GPIO.HIGH)
+
+            rec = 0
+            info = ""
+            address = 0
+            while rec != 125:
+                while(spi.xfer2([5,0])[1] == 1):
+                    pass
+
+                rec = spi.xfer2([3, address//256, address%256, 0])[3]
+
+                if(rec == 0 or rec == 255):
+                    break
+
+                info += chr(rec)
+                address += 1
+            if info:
+                boards.append({**json.loads(info), **{"address": board_addr}})
+
+        sensor_type = { 0x58: "BMP280", 0x60: "BME280" }
+        sensors = []
+
+        GPIO.setup(PIN_SIMAR_LSB, GPIO.OUT)
+        GPIO.setup(PIN_SIMAR_MSB, GPIO.OUT)
+
+        for i in range(0,4):
+            GPIO.output(PIN_SIMAR_LSB, GPIO.HIGH if (i >> 1) & 1 else GPIO.LOW)
+            GPIO.output(PIN_SIMAR_MSB, GPIO.HIGH if (i >> 0) & 1 else GPIO.LOW)
+            for addr in ["0x76", "0x77"]:
+                try:
+                    # Using check_output for backwards compatibility
+                    sensor_reply = int(subprocess.check_output(["i2cget", "-y", "2", addr, "0xD0"]), 16)
+
+                    if sensor_reply:
+                        sensors.append("{} - Ch. {} ({})".format(sensor_type[sensor_reply], i, addr))
+                except (subprocess.CalledProcessError, KeyError, ValueError, TypeError):
+                    pass
+
+        key_list = list(Device_Type.keys())
+        val_list = list(Device_Type.values())
+
+        file = open(RES_FILE, "w+")
+        file.writelines("SIMAR")
+        file.close()
+
+        file = open(DEVICE_JSON, "w+")
+        file.writelines(json.dumps({"device": key_list[val_list.index("SIMAR")], "sensors": sensors, "details": "SIMAR - Connected: [{}]".format(simar.addr()), "baudrate": 0, "boards":boards, "time": str(datetime.now())})+"\n")
+        file.close()
+
+        exit(0)
+
 
 def counting_pru():
     """
@@ -93,7 +176,7 @@ def counting_pru():
     """
     logger.debug("Counting PRU")
     if PRUserial485_address() != 21 and not os.path.exists(PORT):
-        counters = Addressing()
+        counters = CountingPRU_addr()
         os.system("/root/counting-pru/src/DTO_CountingPRU.sh")
         name = "Counting PRU"
         persist_info(

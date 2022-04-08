@@ -48,7 +48,6 @@ class BBB:
         self.node.sector = Sector.get_sector_by_ip_address(self.node.ip_address)
 
         self.current_config_json_mtime = None
-        
 
         # Load the data from the cfg file.
         self.check_config_json()
@@ -66,6 +65,7 @@ class BBB:
                     self.current_config_json_mtime = config_json_mtime
                     self.node.type.code = int(config["device"])
                     self.node.details = "{}\tbaudrate={}".format(config["details"], config["baudrate"])
+                    self.node.config_time = config["time"]
                     self.name = (config["name"])
                     self.write_node_configuration()
 
@@ -255,7 +255,6 @@ class BBB:
                             if d_info.startswith("Interface"):
                                 if d_info == "Interface={}".format(self.interface_name):
                                     return service
-                                    
         raise ValueError("Connmanctl service could not be found for interface {}".format(self.interface_name))
 
 

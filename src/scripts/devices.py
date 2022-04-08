@@ -1,4 +1,3 @@
-
 #!/usr/bin/python-sirius
 import logging
 import time
@@ -24,7 +23,6 @@ import Adafruit_BBIO.SPI as SPI
 
 sys.path.append(os.path.join(os.path.dirname(os.path.realpath(__file__)), "../../../"))
 from bbb import Type
-
 SPIxCONV = False
 
 if os.path.exists("/root/SPIxCONV/software/scripts"):
@@ -51,9 +49,6 @@ GPIO.setup(PIN_FTDI_PRU, GPIO.IN)
 GPIO.setup(PIN_RS232_RS485, GPIO.IN)
 
 logger = get_logger("Devices")
-
-
-
 
 # Checks  if flash memory  is mounted 
 def pendrive():
@@ -99,7 +94,7 @@ def reset():
     """
     Reset device.json content.
     """
-    persist_info(0, 0, " ","RESET", "Searching for connected equipments.")
+    persist_info(0, 0, " ", "RESET", "Searching for connected equipments.")
 
 
 def counting_pru():
@@ -237,7 +232,6 @@ def getPSnames(ps_ID):
 
 
 def mbtemp():
-
     """
     MBTemp
     """
@@ -260,8 +254,7 @@ def mbtemp():
         name = "MBTemp"
         if len(devices):
             persist_info(Type.MBTEMP, name, baud, MBTEMP, "MBTemps connected {}".format(devices))
-
-                    
+ 
 
 def mks9376b():
     """
@@ -288,7 +281,7 @@ def mks9376b():
         ser.close()
         name = "MBTemp"
         if len(devices):
-            persist_info(Type.MKS937B, name,baud, MKS937B, "MKS937Bs connected {}".format(devices))
+            persist_info(Type.MKS937B, name, baud, MKS937B, "MKS937Bs connected {}".format(devices))
 
 
 def Agilent4UHV_CRC(string):
@@ -336,7 +329,7 @@ def agilent4uhv():
         ser.close()
         name = "Agilent 4UHV"
         if len(devices):
-            persist_info(Type.AGILENT4UHV, name ,baud, AGILENT4UHV, "AGILENT4UHV connected {}".format(devices))
+            persist_info(Type.AGILENT4UHV, name , baud, AGILENT4UHV, "AGILENT4UHV connected {}".format(devices))
 
 
 def spixconv():
@@ -357,47 +350,49 @@ def spixconv():
     subprocess.call("config-pin P9_24 gpio", shell=True)  # LDAC / CNVST
     subprocess.call("config-pin P9_26 gpio", shell=True)  # RS
 
-    # Starts checking  for a flash memory
-    find_devices =  check_devices()
 
-    if(find_devices.find('sda') == -1 and find_devices.find('sdb') == -1):
-        print("Pendrive  not detected")
-        exit()
+    for addr in range(0, 255):
+        if flash.ID_read(addr) == 4:
+            spi_addr = 8 if flash.address_read(addr) == 0 else flash.address_read(addr)
+            logger.info(
+                "Addr code: {}\nSelection Board ID: {}\nFlash address: {}\n Name {}\nSPI address: {}".format(
+                    addr,
+                    selection.board_ID(addr),
+                    flash.address_read(addr),
+                    name,
+                    spi_addr,
+                    
+                )
+            )
 
-    else:
-        print("Pendrive detected")
-        devices = pendrive()
-        result = devices.find('/mnt/USB')
+        # Starts checking  for a flash memory
+        find_devices =  check_devices()
 
-        if(result == -1):
-            mount_pendrive()
+        if(find_devices.find('sda') == -1 and find_devices.find('sdb') == -1):
+            print("Pendrive  not detected")
+            name = "No pendrive"
 
-        pendrive_files  = read_pendrive()
+        else:
+            print("Pendrive detected")
+            devices = pendrive()
+            result = devices.find('/mnt/USB')
 
-        if(pendrive_files.find('AutoConfig.xlsx') == -1 and pendrive_files.find('AutoConfig.txt') == -1):
-            print("No files detected")
+            if(result == -1):
+                mount_pendrive()
 
-        if(pendrive_files.find('AutoConfig.xlsx') ==-1  and pendrive_files.find('AutoConfig.txt') !=  -1):
-            file = open('/mnt/USB/AutoConfig.txt')
-            lines = file.readlines()
-            bbb = lines[0].split("\n")
-            print(bbb[0])
-            name = bbb[0]
+            pendrive_files  = read_pendrive()
 
-            for addr in range(0, 255):
-                if flash.ID_read(addr) == 4:
-                    spi_addr = 8 if flash.address_read(addr) == 0 else flash.address_read(addr)
-                    logger.info(
-                        "Addr code: {}\nSelection Board ID: {}\nFlash address: {}\n Name {}\nSPI address: {}".format(
-                            addr,
-                            selection.board_ID(addr),
-                            flash.address_read(addr),
-                            name,
-                            spi_addr,
-                            
-                        )
-                    )
-            persist_info(Type.SPIXCONV,  name, spi_addr, SPIXCONV, "SPIXCONV connected {}".format(spi_addr))
+            if(pendrive_files.find('AutoConfig.xlsx') == -1 and pendrive_files.find('AutoConfig.txt') == -1):
+                print("No files detected")
+
+            if(pendrive_files.find('AutoConfig.xlsx') ==-1  and pendrive_files.find('AutoConfig.txt') !=  -1):
+                file = open('/mnt/USB/AutoConfig.txt')
+                lines = file.readlines()
+                bbb = lines[0].split("\n")
+                print(bbb[0])
+                name = bbb[0] 
+
+        persist_info(Type.SPIXCONV,  name, spi_addr, SPIXCONV, "SPIXCONV connected {}".format(spi_addr))
 
     
 

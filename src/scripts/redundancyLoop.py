@@ -1,7 +1,6 @@
 #!/usr/bin/python-sirius
 # -*- coding: utf-8 -*-
 
-from unicodedata import name
 import Adafruit_BBIO.GPIO as GPIO
 import Adafruit_BBIO.UART as UART
 from bbb import BBB

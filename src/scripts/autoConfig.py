@@ -1,6 +1,5 @@
 #!/usr/bin/python-sirius
 # # -*- coding: utf-8 -*-
-from unicodedata import name
 import serial
 import subprocess
 import json
@@ -32,10 +31,11 @@ class AutoConfig:
         self.status = False
         self.check()
 
-    def read_USB0(self):
+    def read_folder(self):
             p = subprocess.run(['ls','/dev'],stdout= subprocess.PIPE)
             stdout = p.stdout
-            return stdout.decode('ISO-8859-1') if p.returncode == 0 else ''
+            return stdout.decode('ISO-8859-1')
+
     def check(self):
         """
         Check whether AUTOCONFIG is enabled only for some subnets
@@ -63,7 +63,7 @@ class AutoConfig:
 
             # SERIALxxCON - AUTOCONFIG: RTS and CTS pins tied together (jumper)
             elif self.boardID == SERIALXXCON_ID:
-                read_usb = self.read_USB0()
+                read_usb = self.read_folder()
 
                 if(read_usb.find('ttyUSB') != -1):
                     for i in range(5):
@@ -134,7 +134,6 @@ if __name__ == "__main__":
         # Check if current BBB (type and devices found is on ConfigurationTable)
         if beagles.data:
             for bbb in beagles.data[mybbb.type]:
-
                 # If PowerSupply, check their names instead of IDs
                 if mybbb.type == "PowerSupply":
                     mybbb.PSnames = []
@@ -149,7 +148,7 @@ if __name__ == "__main__":
                     if any(psname in bbb[DEVICE_NAME_COLUMN] for psname in mybbb.PSnames):
                         mybeagle_config = bbb
 
-                if mybbb.type == "SPIxCONV" and mybbb.name == bbb[DEVICE_NAME_COLUMN]:
+                elif mybbb.type == "SPIxCONV" and mybbb.name == bbb[DEVICE_NAME_COLUMN]:
                      mybeagle_config = bbb
         
                 # If not PowerSupply, check IDs
@@ -200,7 +199,7 @@ if __name__ == "__main__":
                     "manual",
                     new_ip_address=new_ip,
                     new_mask="255.255.255.0",
-                    new_gateway="10.0.{}.1".format(subnet),
+                    new_gateway="10.128.{}.1".format(subnet),
                 )
             else:
                 if not (IP_AVAILABLE_1 or IP_AVAILABLE_2):
@@ -290,4 +289,3 @@ if __name__ == "__main__":
                         )
             except:
                 logger.info("BBB configuration not found ! Keeping DHCP")
-

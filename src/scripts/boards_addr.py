@@ -106,7 +106,7 @@ class Simar_addr:
 
     def addr(self):
         addressing = 0
-        for pow, pin in enumerate(self.addr_pins[:-2]):
+        for pow, pin in enumerate(self.addr_pins[2:]):
             addressing += GPIO.input(pin)*(2**pow)
 
         return(addressing)

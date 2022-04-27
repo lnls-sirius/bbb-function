@@ -1,0 +1,14 @@
+[Unit]
+Description=BeagleBone Black logging service.
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+Type=simple
+WorkingDirectory=/storage/misc/repository/rsync/data/bbb-daemon/host
+ExecStart=/usr/bin/python3 /storage/misc/repository/rsync/data/bbb-daemon/host/tcp_logging.py -f /storage/misc/repository/bbb-daemon-log
+StandardOutput=syslog
+StandardError=syslog
+
+[Install]
+WantedBy=multi-user.target

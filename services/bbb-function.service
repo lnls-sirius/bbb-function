@@ -1,0 +1,19 @@
+[Unit]
+Description=BeagleBone Black Daemon Function Identification and Synchronism Service
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+Restart=always
+RestartSec=3
+Type=simple 
+WorkingDirectory=/root/bbb-function/
+ExecStartPre=/bin/sleep 5
+ExecStart=/bin/bash /root/bbb-function/src/run-functions.sh
+StandardOutput=syslog
+StandardError=syslog
+
+[Install]
+WantedBy=multi-user.target
+
+

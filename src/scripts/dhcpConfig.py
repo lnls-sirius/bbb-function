@@ -60,9 +60,9 @@ if __name__ == "__main__":
     if PRUserial485_address() == COUNTINGPRU_SIMAR_ADDRESS:
         simar = Simar_addr()
 
-        if Simar_addr.check():
-            for pin in ["P9_25", "P9_26"]:
-                GPIO.setup(pin, GPIO.IN)
+        if simar.identified:
+            #for pin in ["P9_25", "P9_26"]:
+            #    GPIO.setup(pin, GPIO.IN)
             if (GPIO.input("P9_25") == 1 and GPIO.input("P9_26") == 0):
                 logger.info("SIMAR red switches on DHCP position. Configuring DHCP.")
                 dhcp()

@@ -73,7 +73,7 @@ def simar():
     logger.debug("SIMAR")
     simar = Simar_addr()
 
-    if Simar_addr.check():
+    if simar.identified:
         boards = []
 
         spi = SPI.SPI(0, 0)

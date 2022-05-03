@@ -2,7 +2,7 @@
 import logging
 from math import log
 from CountingPRU import *
-from Adafruit_BBIO import GPIO
+from Adafruit_BBIO import GPIO, ADC
 
 
 def update_file(file_path="./", value=""):
@@ -94,10 +94,16 @@ class Simar_addr:
         self.logger = logging.getLogger()
         self.logger.info("Checking Board Address - SIMAR")
 
-        self.addr_pins = ["P9_26", "P9_25", "P9_41", "P9_23", "P9_24"]
+        ADC.setup()
+        volts = ADC.read("P9_33") * 1.8
 
-        for pin in self.addr_pins:
-            GPIO.setup(pin, GPIO.IN)
+        self.identified = abs(volts * 11 - 5) < 0.2
+
+        if self.identified:
+            self.addr_pins = ["P9_26", "P9_25", "P9_41", "P9_23", "P9_24"]
+
+            for pin in self.addr_pins:
+                GPIO.setup(pin, GPIO.IN)
 
     def autoConfig_Available(self):
         '''If both addr 4 and addr 3 are TRUE, autoConfig is available'''
@@ -110,17 +116,3 @@ class Simar_addr:
             addressing += GPIO.input(pin)*(2**pow)
 
         return(addressing)
-
-    @staticmethod
-    def check():
-        from Adafruit_BBIO import ADC
-        ADC.setup()
-        volts = ADC.read("P9_33") * 1.8
-
-        return(abs(volts * 11 - 5) < 0.2)
-
-if __name__ == "__main__":
-    simar = Simar_addr()
-    print(f"Is Simar? {Simar_addr.check()}\
-            Addressing: {simar.addr()}\
-            AutoConfig: {simar.autoConfig_Available()}")

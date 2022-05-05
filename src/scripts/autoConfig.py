@@ -120,24 +120,27 @@ if __name__ == "__main__":
         beagles = GetData(datafile=AUTOCONFIG_FILE, subnet=mybbb.currentSubnet)
         # Check if current BBB (type and devices found is on ConfigurationTable)
         if beagles.data:
-            for bbb in beagles.data[mybbb.type]:
-                # If PowerSupply, check their names instead of IDs
-                if mybbb.type == "PowerSupply":
-                    mybbb.PSnames = []
-                    nodes = json.loads(mybbb.node.details.split("\t")[0].split("Names:")[-1].replace("'", '"'))
+            try:
+                for bbb in beagles.data[mybbb.type]:
+                    # If PowerSupply, check their names instead of IDs
+                    if mybbb.type == "PowerSupply":
+                        mybbb.PSnames = []
+                        nodes = json.loads(mybbb.node.details.split("\t")[0].split("Names:")[-1].replace("'", '"'))
 
-                    for node in nodes:
-                        if "PS model FBP" in mybbb.node.details:
-                            mybbb.PSnames.extend(node.split("/"))
-                        else:
-                            mybbb.PSnames.extend(node.split(","))
+                        for node in nodes:
+                            if "PS model FBP" in mybbb.node.details:
+                                mybbb.PSnames.extend(node.split("/"))
+                            else:
+                                mybbb.PSnames.extend(node.split(","))
 
-                    if any(psname in bbb[DEVICE_NAME_COLUMN] for psname in mybbb.PSnames):
-                        mybeagle_config = bbb
-                # If not PowerSupply, check IDs
-                else:
-                    if any(id in bbb[DEVICE_ID_COLUMN] for id in mybbb.ids):
-                        mybeagle_config = bbb
+                        if any(psname in bbb[DEVICE_NAME_COLUMN] for psname in mybbb.PSnames):
+                            mybeagle_config = bbb
+                    # If not PowerSupply, check IDs
+                    else:
+                        if any(id in bbb[DEVICE_ID_COLUMN] for id in mybbb.ids):
+                            mybeagle_config = bbb
+            except KeyError:
+                pass
 
         # If BBB config is found, proceed with configuration from datafile
         if mybeagle_config:

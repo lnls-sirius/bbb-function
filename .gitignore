@@ -5,3 +5,5 @@ src/scripts/__pycache__/*
 *.swp
 *.save
 *~lock*
+
+src/scripts/AUTOCONFIG.xlsx

@@ -18,8 +18,9 @@ logger = get_logger("AutoConfig")
 
 # Constants
 COUNTINGPRU_SIMAR_ID = 0
+SPIXCONV_ID = 20
 SERIALXXCON_ID = 21
-CONFIGURED_SUBNETS = ["102", "103", "104", "105", "106", \
+CONFIGURED_SUBNETS = ["101", "102", "103", "104", "105", "106", \
 "107", "108", "109", "110", "111", "112",\
 "113", "114", "115", "116", "117", "118", "119", "120", "121", "123", \
 "131", "132", "133", "134", "135", "136", "137"]
@@ -31,6 +32,10 @@ class AutoConfig:
         self.status = False
         self.check()
 
+    def read_folder(self):
+            p = subprocess.run(['ls','/dev'],stdout= subprocess.PIPE)
+            stdout = p.stdout
+            return stdout.decode('ISO-8859-1') 
     def check(self):
         """
         Check whether AUTOCONFIG is enabled only for some subnets
@@ -41,7 +46,7 @@ class AutoConfig:
                 self.simar = Simar_addr()
                 self.counter = CountingPRU_addr()
 
-                if self.simar.identified:
+                if simar.identified:
                     for _ in range(5):
                         self.status = self.simar.autoConfig_Available()
                         if self.status:
@@ -56,13 +61,19 @@ class AutoConfig:
                         sleep(2)
 
             # SERIALxxCON - AUTOCONFIG: RTS and CTS pins tied together (jumper)
-            elif self.boardID == SERIALXXCON_ID:
-                for i in range(5):
-                    try:
-                        self.status = serial.Serial("/dev/ttyUSB0").cts
-                    except:
-                        self.status = False
-                        sleep(2)
+            elif self.boardID == SERIALXXCON_ID or self.boardID == SPIXCONV_ID:
+                read_usb = self.read_folder()
+
+                if(read_usb.find('ttyUSB') != -1):
+                    for i in range(5):
+                        try:
+                            self.status = serial.Serial("/dev/ttyUSB0").cts
+                        except:
+                            self.status = False
+                            sleep(2)
+                else:
+                    # Considera SPIxCONV = Pulsados
+                    self.status = True
 
         # Subnet not configured, then:
         else:
@@ -103,14 +114,16 @@ class GetData:
 
 
 if __name__ == "__main__":
+    #AUTOCONFIG = True 
     AUTOCONFIG = AutoConfig().status
+   
 
     if AUTOCONFIG:
         mybeagle_config = ""
-
+        
         # Get device.json from whoami.py and get identified equipment
         mybbb = BBB()
-
+        logger.info("{}".format(mybbb))
         mybbb.type = Device_Type[mybbb.node.type.code]
         mybbb.ids = [int(s) for s in re.findall(r"\d+", mybbb.node.details.split("\t")[0])]
         mybbb.currentIP = str(mybbb.get_network_specs()[1])
@@ -118,26 +131,33 @@ if __name__ == "__main__":
 
         # Get devices from this subnet from the ConfigurationTable
         beagles = GetData(datafile=AUTOCONFIG_FILE, subnet=mybbb.currentSubnet)
+
         # Check if current BBB (type and devices found is on ConfigurationTable)
         if beagles.data:
-            for bbb in beagles.data[mybbb.type]:
-                # If PowerSupply, check their names instead of IDs
-                if mybbb.type == "PowerSupply":
-                    mybbb.PSnames = []
-                    nodes = json.loads(mybbb.node.details.split("\t")[0].split("Names:")[-1].replace("'", '"'))
+            try:
+                for bbb in beagles.data[mybbb.type]:
+                    # If PowerSupply, check their names instead of IDs
+                    if mybbb.type == "PowerSupply":
+                        mybbb.PSnames = []
+                        nodes = json.loads(mybbb.node.details.split("\t")[0].split("Names:")[-1].replace("'", '"'))
 
-                    for node in nodes:
-                        if "PS model FBP" in mybbb.node.details:
-                            mybbb.PSnames.extend(node.split("/"))
-                        else:
-                            mybbb.PSnames.extend(node.split(","))
+                        for node in nodes:
+                            if "PS model FBP" in mybbb.node.details:
+                                mybbb.PSnames.extend(node.split("/"))
+                            else:
+                                mybbb.PSnames.extend(node.split(","))
 
-                    if any(psname in bbb[DEVICE_NAME_COLUMN] for psname in mybbb.PSnames):
+                        if any(psname in bbb[DEVICE_NAME_COLUMN] for psname in mybbb.PSnames):
+                            mybeagle_config = bbb
+
+                    elif (mybbb.type == "SPIxCONV" and mybbb.name == bbb[DEVICE_NAME_COLUMN]):
                         mybeagle_config = bbb
-                # If not PowerSupply, check IDs
-                else:
-                    if any(id in bbb[DEVICE_ID_COLUMN] for id in mybbb.ids):
-                        mybeagle_config = bbb
+                    # If not PowerSupply, check IDs
+                    else:
+                        if any(id in bbb[DEVICE_ID_COLUMN] for id in mybbb.ids):
+                            mybeagle_config = bbb
+            except KeyError:
+                pass
 
         # If BBB config is found, proceed with configuration from datafile
         if mybeagle_config:
@@ -168,7 +188,6 @@ if __name__ == "__main__":
                 IP_AVAILABLE_2 = False
             # Check requested subnet
             subnet = mybeagle_config[BBB_IP_1_COLUMN].split(".")[2]
-
 
             # Update IP, if available
             if (IP_AVAILABLE_1 or IP_AVAILABLE_2) and subnet == mybbb.currentSubnet:

@@ -66,7 +66,7 @@ class BBB:
                     self.node.type.code = int(config["device"])
                     self.node.details = "{}\tbaudrate={}".format(config["details"], config["baudrate"])
                     self.node.config_time = config["time"]
-
+                    self.name = (config["name"])
                     self.write_node_configuration()
 
     def get_current_config(self):
@@ -255,7 +255,6 @@ class BBB:
                             if d_info.startswith("Interface"):
                                 if d_info == "Interface={}".format(self.interface_name):
                                     return service
-
         raise ValueError("Connmanctl service could not be found for interface {}".format(self.interface_name))
 
 

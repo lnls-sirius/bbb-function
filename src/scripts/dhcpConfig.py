@@ -52,7 +52,7 @@ if __name__ == "__main__":
     # AutoConfig Status
     # ----------------------------------
     AUTOCONFIG = AutoConfig().status
-
+    logger.info(AUTOCONFIG)
     # ----------------------------------
     # Apply DHCP config if needed
     # ----------------------------------

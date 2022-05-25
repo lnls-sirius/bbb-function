@@ -432,8 +432,7 @@ def spixconv():
             name = ''
 
             if(find_devices.find('sda') == -1 and find_devices.find('sdb') == -1):
-                continue
-                #exit()
+                pass
 
             else:
                 devices = pendrive()

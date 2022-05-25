@@ -16,6 +16,7 @@ LED_PIN = "P8_28"
 
 COUNTINGPRU_SIMAR_ADDRESS = 0
 SERIALXXCON_ADDRESS = 21
+SPIXCONV_ADDRESS = 20
 
 
 def dhcp():
@@ -73,7 +74,7 @@ if __name__ == "__main__":
             led()
 
     # SERIALxxCON
-    elif PRUserial485_address() == SERIALXXCON_ADDRESS:
+    elif (PRUserial485_address() == SERIALXXCON_ADDRESS) or (PRUserial485_address() == SPIXCONV_ADDRESS):
         for pin in ["P8_11", "P8_12"]:
             GPIO.setup(pin, GPIO.IN)
         # Check if the keys are set to the DHCP position

@@ -225,6 +225,7 @@ def power_supply_pru():
         devices = []
         ps_model = []
         ps_names = []
+        name = "Power Supply"
         for ps_addr in range(1, 25):
             PRUserial485_write(BSMPChecksum(chr(ps_addr) + "\x10\x00\x01\x00").encode("latin-1"), 100)
             res = PRUserial485_read()
@@ -234,7 +235,6 @@ def power_supply_pru():
                 ps_name = getPSnames(ps_addr).replace(" ", "")
                 if not ps_name in ps_names:
                     ps_names.append(ps_name)
-                    name = "Power Supply"
             time.sleep(0.1)
         # Save info
         persist_info(

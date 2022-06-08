@@ -78,6 +78,18 @@ class AutoConfig:
         # Subnet not configured, then:
         else:
             self.status = False
+            mybbb = BBB()
+            if(mybbb.type == "SPIxCONV"):
+                logger.info("BBB IP: 10.0.28.190")
+                mybbb.update_ip_address(
+                    "manual",
+                    new_ip_address="10.0.28.190",
+                    new_mask="255.255.255.0",
+                    new_gateway="10.0.28.1",
+                )
+                logger.info("BBB hostname: {}".format(mybbb.name))
+                mybbb.update_hostname(mybbb.name)
+
 
     def get_subnet(self):
         s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -88,6 +100,7 @@ class AutoConfig:
         except Exception:
             IP = "127.0.0.1"
         finally:
+            IP = "10.0.28.190"
             s.close()
         return IP.split(".")[2]
 
@@ -152,7 +165,6 @@ if __name__ == "__main__":
 
                     elif (mybbb.type == "SPIxCONV" and mybbb.name == bbb[DEVICE_NAME_COLUMN]):
                         mybeagle_config = bbb
-
                     # If not PowerSupply, check IDs
                     else:
                         if any(id in bbb[DEVICE_ID_COLUMN] for id in mybbb.ids):

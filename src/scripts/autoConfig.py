@@ -230,14 +230,14 @@ if __name__ == "__main__":
 
 
         # IT network, ISP laboratory. Then:
-        elif(mybbb.type == "SPIxCONV" and mybbb.currentSubnet == "6"):
+        elif(mybbb.type == "SPIxCONV" and mybbb.currentSubnet == "28"):
             mybbb.update_ip_address(
                 "manual",
-                new_ip_address="10.0.6.190",
+                new_ip_address="10.0.28.190",
                 new_mask="255.255.255.0",
-                new_gateway="10.0.6.1",
+                new_gateway="10.0.28.1",
             )
-            logger.info("IT infrastructure, ISP lab! IP {} and BBB hostname: {}".format("10.0.6.190", mybbb.name))
+            logger.info("IT infrastructure, ISP lab! IP {} and BBB hostname: {}".format("10.0.28.190", mybbb.name))
             mybbb.update_hostname(mybbb.name)
 
 

@@ -72,6 +72,10 @@ class AutoConfig:
                             self.status = False
                             sleep(2)
 
+            elif self.boardID == SPIXCONV_ID:
+                read_usb = self.read_folder()
+                self.status = True
+
         # SPIxCONV
         elif self.boardID == SPIXCONV_ID:
             logger.info("SPIXCONV")

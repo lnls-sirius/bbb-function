@@ -61,7 +61,7 @@ class AutoConfig:
                         sleep(2)
 
             # SERIALxxCON - AUTOCONFIG: RTS and CTS pins tied together (jumper)
-            elif self.boardID == SERIALXXCON_ID or self.boardID == SPIXCONV_ID:
+            elif self.boardID == SERIALXXCON_ID:
                 read_usb = self.read_folder()
 
                 if(read_usb.find('ttyUSB') != -1):
@@ -71,13 +71,18 @@ class AutoConfig:
                         except:
                             self.status = False
                             sleep(2)
-                else:
-                    # Considera SPIxCONV = Pulsados
-                    self.status = True
 
-        # Subnet not configured, then:
-        else:
-            self.status = False
+            elif self.boardID == SPIXCONV_ID:
+                read_usb = self.read_folder()
+                self.status = True
+
+        # SPIxCONV
+        elif self.boardID == SPIXCONV_ID:
+            logger.info("SPIXCONV")
+            read_usb = self.read_folder()
+            self.status = True
+
+
 
     def get_subnet(self):
         s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -88,6 +93,7 @@ class AutoConfig:
         except Exception:
             IP = "127.0.0.1"
         finally:
+#            IP = "10.0.28.190"
             s.close()
         return IP.split(".")[2]
 
@@ -152,13 +158,15 @@ if __name__ == "__main__":
 
                     elif (mybbb.type == "SPIxCONV" and mybbb.name == bbb[DEVICE_NAME_COLUMN]):
                         mybeagle_config = bbb
-
                     # If not PowerSupply, check IDs
                     else:
                         if any(id in bbb[DEVICE_ID_COLUMN] for id in mybbb.ids):
                             mybeagle_config = bbb
             except KeyError:
                 pass
+
+
+
 
         # If BBB config is found, proceed with configuration from datafile
         if mybeagle_config:
@@ -223,6 +231,21 @@ if __name__ == "__main__":
                             mybbb.currentSubnet
                         )
                     )
+
+
+        # IT network, ISP laboratory. Then:
+        elif(mybbb.type == "SPIxCONV" and mybbb.currentSubnet == "28"):
+            mybbb.update_ip_address(
+                "manual",
+                new_ip_address="10.0.28.190",
+                new_mask="255.255.255.0",
+                new_gateway="10.0.28.1",
+            )
+            logger.info("IT infrastructure, ISP lab! IP {} and BBB hostname: {}".format("10.0.28.190", mybbb.name))
+            mybbb.update_hostname(mybbb.name)
+
+
+
 
         # If BBB not found, keep DHCP and raise a flag!
         else:

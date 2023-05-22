@@ -11,6 +11,7 @@ from bbb import BBB
 from logger import get_logger
 from boards_addr import *
 from PRUserial485 import PRUserial485_address
+import os
 from os import system
 from time import sleep
 
@@ -46,7 +47,7 @@ class AutoConfig:
                 self.simar = Simar_addr()
                 self.counter = CountingPRU_addr()
 
-                if simar.identified:
+                if self.simar.identified:
                     for _ in range(5):
                         self.status = self.simar.autoConfig_Available()
                         if self.status:
@@ -122,7 +123,7 @@ class GetData:
 if __name__ == "__main__":
     #AUTOCONFIG = True 
     AUTOCONFIG = AutoConfig().status
-   
+    logger.info("AUTOCONFIG: {}".format(AUTOCONFIG)) 
 
     if AUTOCONFIG:
         mybeagle_config = ""
@@ -153,8 +154,9 @@ if __name__ == "__main__":
                             else:
                                 mybbb.PSnames.extend(node.split(","))
 
-                        if any(psname in bbb[DEVICE_NAME_COLUMN] for psname in mybbb.PSnames):
-                            mybeagle_config = bbb
+                        if mybbb.PSnames:
+                            if any(psname in bbb[DEVICE_NAME_COLUMN] for psname in mybbb.PSnames):
+                                mybeagle_config = bbb
 
                     elif (mybbb.type == "SPIxCONV" and mybbb.name == bbb[DEVICE_NAME_COLUMN]):
                         mybeagle_config = bbb
@@ -199,38 +201,47 @@ if __name__ == "__main__":
             subnet = mybeagle_config[BBB_IP_1_COLUMN].split(".")[2]
 
             # Update IP, if available
-            if (IP_AVAILABLE_1 or IP_AVAILABLE_2) and subnet == mybbb.currentSubnet:
-                if IP_AVAILABLE_1:
-                    new_ip = mybeagle_config[BBB_IP_1_COLUMN]
-                else:
-                    new_ip = mybeagle_config[BBB_IP_2_COLUMN]
+            if mybbb.currentIP[:7] == '10.128.':
+                if (IP_AVAILABLE_1 or IP_AVAILABLE_2) and subnet == mybbb.currentSubnet:
+                    if IP_AVAILABLE_1:
+                        new_ip = mybeagle_config[BBB_IP_1_COLUMN]
+                    else:
+                        new_ip = mybeagle_config[BBB_IP_2_COLUMN]
 
-                logger.info("BBB IP: {}".format(new_ip))
-                mybbb.update_ip_address(
-                    "manual",
-                    new_ip_address=new_ip,
-                    new_mask="255.255.255.0",
-                    new_gateway="10.128.{}.1".format(subnet),
-                )
-            else:
-                if not (IP_AVAILABLE_1 or IP_AVAILABLE_2):
-                    if mybeagle_config[BBB_IP_1_COLUMN] == mybbb.currentIP or mybeagle_config[BBB_IP_2_COLUMN] == mybbb.currentIP:
-                        logger.info("BBB IP is already configured to {}.".format(mybbb.currentIP))
+                    logger.info("BBB IP: {}".format(new_ip))
+                    mybbb.update_ip_address(
+                        "manual",
+                        new_ip_address=new_ip,
+                        new_mask="255.255.255.0",
+                        new_gateway="10.128.{}.1".format(subnet),
+                    )
+                else:
+                    if not (IP_AVAILABLE_1 or IP_AVAILABLE_2):
+                        if mybeagle_config[BBB_IP_1_COLUMN] == mybbb.currentIP or mybeagle_config[BBB_IP_2_COLUMN] == mybbb.currentIP:
+                            logger.info("BBB IP is already configured to {}.".format(mybbb.currentIP))
+                        else:
+                            logger.error(
+                                "Desired IPs {} / {} are currently in use by other devices.".format(
+                                    mybeagle_config[BBB_IP_1_COLUMN],
+                                    mybeagle_config[BBB_IP_2_COLUMN]
+                                )
+                            )
                     else:
                         logger.error(
-                            "Desired IPs {} / {} are currently in use by other devices.".format(
+                            "Cannot change to IP {} / {}, subnet is not compatible to current one ({}).".format(
                                 mybeagle_config[BBB_IP_1_COLUMN],
-                                mybeagle_config[BBB_IP_2_COLUMN]
+                                mybeagle_config[BBB_IP_2_COLUMN],
+                                mybbb.currentSubnet
                             )
                         )
-                else:
-                    logger.error(
-                        "Cannot change to IP {} / {}, subnet is not compatible to current one ({}).".format(
-                            mybeagle_config[BBB_IP_1_COLUMN],
-                            mybeagle_config[BBB_IP_2_COLUMN],
-                            mybbb.currentSubnet
-                        )
-                    )
+            else:
+                logger.error("Cannot change IP {} to {}/{}, subnet is not compatible. Restarting service...".format(
+                                mybbb.currentIP,
+                                mybeagle_config[BBB_IP_1_COLUMN],
+                                mybeagle_config[BBB_IP_2_COLUMN] 
+                            )
+                )
+                os.system('systemctl restart bbb-function')
 
 
         # IT network, ISP laboratory. Then:
@@ -281,37 +292,46 @@ if __name__ == "__main__":
 
 
                 # Update IP, if available
-                if (IP_AVAILABLE_1 or IP_AVAILABLE_2) and subnet == mybbb.currentSubnet:
-                    if IP_AVAILABLE_1:
-                        new_ip = mybeagle_config[BBB_IP_1_COLUMN]
-                    else:
-                        new_ip = mybeagle_config[BBB_IP_2_COLUMN]
+                if mybbb.currentIP[:7] == '10.128.':
+                    if (IP_AVAILABLE_1 or IP_AVAILABLE_2) and subnet == mybbb.currentSubnet:
+                        if IP_AVAILABLE_1:
+                            new_ip = mybeagle_config[BBB_IP_1_COLUMN]
+                        else:
+                            new_ip = mybeagle_config[BBB_IP_2_COLUMN]
 
-                    logger.info("BBB IP: {}".format(new_ip))
-                    mybbb.update_ip_address(
-                        "manual",
-                        new_ip_address=new_ip,
-                        new_mask="255.255.255.0",
-                        new_gateway="10.128.{}.1".format(subnet),
-                    )
-                else:
-                    if not (IP_AVAILABLE_1 or IP_AVAILABLE_2):
-                        if mybeagle_config[BBB_IP_1_COLUMN] == mybbb.currentIP or mybeagle_config[BBB_IP_2_COLUMN] == mybbb.currentIP:
-                            logger.info("BBB IP is already configured to {}.".format(mybbb.currentIP))
+                        logger.info("BBB IP: {}".format(new_ip))
+                        mybbb.update_ip_address(
+                            "manual",
+                            new_ip_address=new_ip,
+                            new_mask="255.255.255.0",
+                            new_gateway="10.128.{}.1".format(subnet),
+                        )
+                    else:
+                        if not (IP_AVAILABLE_1 or IP_AVAILABLE_2):
+                            if mybeagle_config[BBB_IP_1_COLUMN] == mybbb.currentIP or mybeagle_config[BBB_IP_2_COLUMN] == mybbb.currentIP:
+                                logger.info("BBB IP is already configured to {}.".format(mybbb.currentIP))
+                            else:
+                                logger.error(
+                                    "Desired IPs {} / {} are currently in use by other devices.".format(
+                                        mybeagle_config[BBB_IP_1_COLUMN],
+                                        mybeagle_config[BBB_IP_2_COLUMN]
+                                    )
+                                )
                         else:
                             logger.error(
-                                "Desired IPs {} / {} are currently in use by other devices.".format(
+                                "Cannot change to IP {} / {}, subnet is not compatible to current one ({}).".format(
+                                    mybeagle_config[BBB_IP_1_COLUMN],
+                                    mybeagle_config[BBB_IP_2_COLUMN],
+                                    mybbb.currentSubnet
+                                )
+                            )
+                else:
+                    logger.error("Cannot change IP {} to {}/{}, subnet is not compatible. Restarting service...".format(
+                                    mybbb.currentIP,
                                     mybeagle_config[BBB_IP_1_COLUMN],
                                     mybeagle_config[BBB_IP_2_COLUMN]
                                 )
-                            )
-                    else:
-                        logger.error(
-                            "Cannot change to IP {} / {}, subnet is not compatible to current one ({}).".format(
-                                mybeagle_config[BBB_IP_1_COLUMN],
-                                mybeagle_config[BBB_IP_2_COLUMN],
-                                mybbb.currentSubnet
-                            )
-                        )
+                    )
+                    os.system('systemctl restart bbb-function')
             except:
                 logger.info("BBB configuration not found ! Keeping DHCP")

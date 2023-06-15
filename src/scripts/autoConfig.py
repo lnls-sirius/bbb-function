@@ -11,7 +11,6 @@ from bbb import BBB
 from logger import get_logger
 from boards_addr import *
 from PRUserial485 import PRUserial485_address
-import os
 from os import system
 from time import sleep
 
@@ -89,7 +88,7 @@ class AutoConfig:
                                 mybbb.currentIP,
                             )
                 )
-            os.system('systemctl restart bbb-function')
+            system('systemctl restart bbb-function')
 
     def get_ip(self):
         s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -252,7 +251,7 @@ if __name__ == "__main__":
                                 mybeagle_config[BBB_IP_2_COLUMN] 
                             )
                 )
-                os.system('systemctl restart bbb-function')
+                system('systemctl restart bbb-function')
 
 
         # IT network, ISP laboratory. Then:
@@ -343,6 +342,6 @@ if __name__ == "__main__":
                                     mybeagle_config[BBB_IP_2_COLUMN]
                                 )
                     )
-                    os.system('systemctl restart bbb-function')
+                    system('systemctl restart bbb-function')
             except:
                 logger.info("BBB configuration not found ! Keeping DHCP")

@@ -4,10 +4,6 @@
 source ${FUNCTION_BASE}/src/scripts/functions.sh
 source ${FUNCTION_BASE}/src/envs.sh
 
-
-sleep 60
-
-
 pushd ${FUNCTION_BASE}/src/scripts
 
     function cleanup {

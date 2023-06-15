@@ -41,7 +41,8 @@ class AutoConfig:
         """
         Check whether AUTOCONFIG is enabled only for some subnets
         """
-        if self.get_subnet() in CONFIGURED_SUBNETS:
+        currentIPvalue = self.get_ip()
+        if (currentIPvalue.split(".")[2] in CONFIGURED_SUBNETS) and (currentIPvalue[:7] == '10.128.'):
             # COUNTINGPRU
             if self.boardID == COUNTINGPRU_SIMAR_ID:
                 self.simar = Simar_addr()
@@ -83,20 +84,30 @@ class AutoConfig:
             read_usb = self.read_folder()
             self.status = True
 
+        elif (currentIPvalue[:7] != '10.128.') or (currentIPvalue[:5] != '10.0.'):
+            logger.error("Unknown IP {}. Wait a valid one! Restarting service...".format(
+                                mybbb.currentIP,
+                            )
+                )
+            os.system('systemctl restart bbb-function')
 
-
-    def get_subnet(self):
+    def get_ip(self):
         s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        try:
-            # doesn't have to be reachable
-            s.connect(("10.128.101.100", 1))
-            IP = s.getsockname()[0]
-        except Exception:
-            IP = "127.0.0.1"
-        finally:
-#            IP = "10.0.28.190"
-            s.close()
-        return IP.split(".")[2]
+        while True:
+            try:
+                # doesn't have to be reachable
+                s.connect(("10.128.101.100", 1))
+                IP = s.getsockname()[0]
+                logger.info("Get IP: {}".format(IP)) 
+                s.close()
+                break
+
+            except Exception:
+                IP = "127.0.0.1"
+                logger.info("Get IP exception: {}. Retrying in 5 secs...".format(IP))
+                sleep(5)
+                
+        return IP
 
 
 class GetData:

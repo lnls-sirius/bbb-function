@@ -85,7 +85,7 @@ class AutoConfig:
 
         elif (currentIPvalue[:7] != '10.128.') or (currentIPvalue[:5] != '10.0.'):
             logger.error("Unknown IP {}. Wait a valid one! Restarting service...".format(
-                                mybbb.currentIP,
+                                currentIPvalue,
                             )
                 )
             system('systemctl restart bbb-function')

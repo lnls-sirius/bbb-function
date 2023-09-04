@@ -112,20 +112,28 @@ class AutoConfig:
 class GetData:
     def __init__(self, datafile=AUTOCONFIG_FILE, subnet=""):
         try:
-            _sheet = open_workbook(datafile).sheet_by_name(subnet)
-            keys = [_sheet.cell(0, col_index).value for col_index in range(_sheet.ncols)]
-            self.data = {}
+            if ".xlsx" in AUTOCONFIG_FILE:
+                _sheet = open_workbook(datafile).sheet_by_name(subnet)
+                keys = [_sheet.cell(0, col_index).value for col_index in range(_sheet.ncols)]
+                self.data = {}
 
-            for row_index in range(1, _sheet.nrows):
-                dev_type = _sheet.cell(row_index, keys.index(DEVICE_TYPE_COLUMN)).value
-                if dev_type == "":
-                    continue
-                info = {keys[col_index]: _sheet.cell(row_index, col_index).value for col_index in range(_sheet.ncols)}
-                info[DEVICE_ID_COLUMN] = [int(s) for s in re.findall(r"\d+", info[DEVICE_ID_COLUMN])]
-                if dev_type in self.data:
-                    self.data[dev_type].append(info)
+                for row_index in range(1, _sheet.nrows):
+                    dev_type = _sheet.cell(row_index, keys.index(DEVICE_TYPE_COLUMN)).value
+                    if dev_type == "":
+                        continue
+                    info = {keys[col_index]: _sheet.cell(row_index, col_index).value for col_index in range(_sheet.ncols)}
+                    info[DEVICE_ID_COLUMN] = [int(s) for s in re.findall(r"\d+", info[DEVICE_ID_COLUMN])]
+                    if dev_type in self.data:
+                        self.data[dev_type].append(info)
+                    else:
+                        self.data[dev_type] = [info]
+            elif ".json" in AUTOCONFIG_FILE:
+                with open(AUTOCONFIG_FILE, "r") as f:
+                    self.data = json.load(f)
+                if subnet in self.data.keys():
+                    self.data = self.data[subnet]
                 else:
-                    self.data[dev_type] = [info]
+                    self.data = {}
         except:
             self.data = {}
 
@@ -183,7 +191,7 @@ if __name__ == "__main__":
         # If BBB config is found, proceed with configuration from datafile
         if mybeagle_config:
             logger.info(
-                "Found a compatible device in spreadsheet: {}. Proceed with BBB configuration!".format(mybeagle_config)
+                "Found a compatible device in {}: {}. Proceed with BBB configuration!".format(AUTOCONFIG_FILE, mybeagle_config)
             )
 
             # Save found config into a json file
@@ -271,7 +279,7 @@ if __name__ == "__main__":
         # If BBB not found, keep DHCP and raise a flag!
         else:
             logger.error(
-                "A compatible device was NOT found in spreadsheet. Verify if there is a config file at {}.".format(
+                "A compatible device was NOT found in datafile. Verify if there is a config file at {}.".format(
                     CONFIG_FILE
                 )
             )

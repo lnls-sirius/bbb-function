@@ -14,7 +14,7 @@ popd
 
 
 # Wait a few seconds before starting
-sleep 30
+#sleep 30
 
 
 # Updating etc folder and bbb-function if rsync server available.

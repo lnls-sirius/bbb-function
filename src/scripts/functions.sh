@@ -111,13 +111,13 @@ function overlay_CountingPRU {
         exit 1
     fi
 
-    if [ ! -f /root/counting-pru/src/DTO_CountingPRU.sh ]; then
-        echo "[ERROR] counting-pru:  The file /root/counting-pru/src/DTO_CountingPRU.sh doesn\'t exist."
+    if [ ! -f /root/counting-pru/src/pinconfig_counting-pru.sh ]; then
+        echo "[ERROR] counting-pru:  The file /root/counting-pru/src/pinconfig_counting-pru.sh doesn\'t exist."
         exit 1
     fi
 
     pushd /root/counting-pru/src
-        ./DTO_CountingPRU.sh
+        ./pinconfig_counting-pru.sh
     popd
 }
 
@@ -157,12 +157,12 @@ function counting_pru {
         exit 1
     fi
 
-    if [ ! -f /root/counting-pru/IOC/SI-CountingPRU_Socket.py ]; then
+    if [ ! -f /root/counting-pru/ioc-interface/SI-CountingPRU_Socket.py ]; then
         echo "[ERROR] CountingPRU: The file /root/counting-pru/IOC/SI-CountingPRU_Socket.py doesn\'t exist."
         exit 1
     fi
 
-    pushd /root/counting-pru/IOC
+    pushd /root/counting-pru/ioc-interface
         ./SI-CountingPRU_Socket.py
     popd
 }

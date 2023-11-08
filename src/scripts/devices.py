@@ -175,7 +175,7 @@ def counting_pru():
     logger.debug("Counting PRU")
     if PRUserial485_address() != 21 and not os.path.exists(PORT):
         counters = CountingPRU_addr()
-        os.system("/root/counting-pru/src/DTO_CountingPRU.sh")
+        os.system("/root/counting-pru/src/pinconfig_counting-pru.sh")
         name = "Counting PRU"
         persist_info(
             Type.COUNTING_PRU,

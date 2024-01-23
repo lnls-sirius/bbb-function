@@ -54,7 +54,7 @@ class AutoConfig:
                             break
                         sleep(2)
                 else:
-                    system("/root/counting-pru/src/DTO_CountingPRU.sh")
+                    system("/root/counting-pru/src/pinconfig_counting-pru.sh")
                     for i in range(5):
                         self.status = self.counter.autoConfig_Available()
                         if self.status:

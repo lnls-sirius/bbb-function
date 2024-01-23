@@ -21,10 +21,10 @@
             {"BBB_IP_1": "10.128.101.118", "BBB_IP_2": "", "BBB_HOSTNAME": "BBB-SALA01-CON-MBTEMP-SR-AFTER-BC", "DEVICE_TYPE": "MBTemp", "DEVICE_ID": [21, 22, 23], "DEVICE_NAME": ""}
             ], 
         "SPIxCONV": [
-            {"BBB_IP_1": "10.128.101.161", "BBB_IP_2": "", "BBB_HOSTNAME": "SI-InjNLKckr", "DEVICE_TYPE": "SPIxCONV", "DEVICE_ID": [], "DEVICE_NAME": "SI-InjNLKckr"}, 
+            {"BBB_IP_1": "10.128.101.161", "BBB_IP_2": "", "BBB_HOSTNAME": "SI-InjDpKckr", "DEVICE_TYPE": "SPIxCONV", "DEVICE_ID": [], "DEVICE_NAME": "SI-InjDpKckr"}, 
             {"BBB_IP_1": "10.128.101.162", "BBB_IP_2": "", "BBB_HOSTNAME": "TB-InjSept", "DEVICE_TYPE": "SPIxCONV", "DEVICE_ID": [], "DEVICE_NAME": "TB-InjSept"}, 
             {"BBB_IP_1": "10.128.101.163", "BBB_IP_2": "", "BBB_HOSTNAME": "TS-InjSeptG-1", "DEVICE_TYPE": "SPIxCONV", "DEVICE_ID": [], "DEVICE_NAME": "TS-InjSeptG-1"}, 
-            {"BBB_IP_1": "10.128.101.164", "BBB_IP_2": "", "BBB_HOSTNAME": "SI-InjDpKckr", "DEVICE_TYPE": "SPIxCONV", "DEVICE_ID": [], "DEVICE_NAME": "SI-InjDpKckr"}, 
+            {"BBB_IP_1": "10.128.101.164", "BBB_IP_2": "", "BBB_HOSTNAME": "SI-InjNLKckr", "DEVICE_TYPE": "SPIxCONV", "DEVICE_ID": [], "DEVICE_NAME": "SI-InjNLKckr"}, 
             {"BBB_IP_1": "10.128.101.165", "BBB_IP_2": "", "BBB_HOSTNAME": "TS-InjSeptF", "DEVICE_TYPE": "SPIxCONV", "DEVICE_ID": [], "DEVICE_NAME": "TS-InjSeptF"}, 
             {"BBB_IP_1": "10.128.101.166", "BBB_IP_2": "", "BBB_HOSTNAME": "TS-InjSeptG-2", "DEVICE_TYPE": "SPIxCONV", "DEVICE_ID": [], "DEVICE_NAME": "TS-InjSeptG-2"}, 
             {"BBB_IP_1": "10.128.101.167", "BBB_IP_2": "", "BBB_HOSTNAME": "BO-InjKckr", "DEVICE_TYPE": "SPIxCONV", "DEVICE_ID": [], "DEVICE_NAME": "BO-InjKckr"}

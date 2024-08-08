@@ -331,24 +331,32 @@ class Sector:
     """
 
     SECTORS = (
-        ["LINAC"]
-        + [("Sala" + str(i).zfill(2)) for i in range(1, 21)]
-        + ["LTs", "Conectividade", "Fontes", "RF", "Outros"]
+        ["LinacArea"]
+        + [("IA-" + str(i).zfill(2)) for i in range(1, 21)]
+        + ["TransportLines", "Connectivity", "PowerArea", "RFArea", "Others"]
     )
-
     SUBNETS = (
         [[ipaddress.ip_network("10.128.1.0/24"), ipaddress.ip_network("10.128.255.0/24")]]
-        + [ipaddress.ip_network("10.128.{}.0/24".format(i)) for i in range(101, 125)]
-        + [ipaddress.ip_network("10.128.{}.0/24".format(i)) for i in range(201, 222)]
+        + [ipaddress.ip_network("10.128.{}.0/24".format(i)) for i in range(101, 123)]
+        + [ipaddress.ip_network("10.128.{}.0/24".format(i)) for i in range(131, 138)]
         + [ipaddress.ip_network("10.128.{}.0/24".format(i)) for i in range(150, 153)]
     )
 
-    # SECTORS_LIST = []
+
     SECTORS_DICT = {}
-    for i in range(1, 22):
-        SECTORS_DICT[str(ipaddress.ip_network("10.128.{}.0/24".format(i + 100)))] = "CON-RACK{}".format(
+    SECTORS_DICT[str(ipaddress.ip_network("10.128.1.0/24"))] = "LinacArea"
+
+    for i in range(1, 21):
+        SECTORS_DICT[str(ipaddress.ip_network("10.128.{}.0/24".format(i + 100)))] = "IA-{}".format(
             str(i).zfill(2)
         )
+
+    SECTORS_DICT[str(ipaddress.ip_network("10.128.121.0/24"))] = "TransportLines"
+    SECTORS_DICT[str(ipaddress.ip_network("10.128.122.0/24"))] = "Connectivity"
+
+    for i in range(31, 38):
+        SECTORS_DICT[str(ipaddress.ip_network("10.128.{}.0/24".format(i + 100)))] = "PowerArea"
+
 
     @staticmethod
     def subnets():
@@ -370,19 +378,15 @@ class Sector:
         :return: the sector that contains the given IP address.
         :raise SectorNotFoundError: IP address is not contained in any sub-network.
         """
-        if type(ip_address) is not ipaddress.IPv4Address:
-            ip_address = ipaddress.ip_address(ip_address)
+        if type(ip_address) is not str:
+            ip_address = str(ip_address)
 
-        for idx, subnet in enumerate(Sector.SUBNETS):
-            if type(subnet) is list:
-                for s in subnet:
-                    if ip_address in s.hosts():
-                        return Sector.SECTORS[idx]
-            elif ip_address in subnet.hosts():
-                if idx < len(Sector.SECTORS):
-                    return Sector.SECTORS[idx]
+        ip_network = str(ipaddress.ip_network("{}.0/24".format(ip_address[0:ip_address.rfind(".")])))
 
-        return Sector.SECTORS[-1]
+        if ip_network in Sector.SECTORS_DICT.keys():
+            return Sector.SECTORS_DICT[ip_network]
+        else:
+            return Sector.SECTORS[-1]
 
     @staticmethod
     def get_default_gateway_of_address(ip_address=None):

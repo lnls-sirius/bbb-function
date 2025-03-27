@@ -7,3 +7,4 @@ src/scripts/__pycache__/*
 *~lock*
 
 src/scripts/AUTOCONFIG.xlsx
+src/scripts/AUTOCONFIG.json

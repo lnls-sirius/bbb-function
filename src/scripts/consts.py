@@ -28,6 +28,7 @@ BBB_IP_2_COLUMN = "BBB_IP_2"
 BBB_HOSTNAME_COLUMN = "BBB_HOSTNAME"
 CONFIG_FILE = "/root/BBB-CONFIG.json"
 AUTOCONFIG_FILE = "AUTOCONFIG.json"
+CONTROL_SYSTEM_CONSTS_AUTOCONFIG_FILE = "http://ais-eng-srv-ta.cnpem.br/control-system-constants/beaglebone/control-system-beaglebone.json"
 SEPARATOR = b"-----"
 
 

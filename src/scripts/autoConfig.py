@@ -41,7 +41,7 @@ class AutoConfig:
         Check whether AUTOCONFIG is enabled only for some subnets
         """
         currentIPvalue = self.get_ip()
-        if (currentIPvalue.split(".")[2] in CONFIGURED_SUBNETS) and (currentIPvalue[:7] == '10.128.'):
+        if((currentIPvalue.split(".")[2] in CONFIGURED_SUBNETS) and (currentIPvalue[:7] == '10.128.')) or (currentIPvalue[:8] == '10.0.28.') or (currentIPvalue[:7] == '10.0.4.'):
             # COUNTINGPRU
             if self.boardID == COUNTINGPRU_SIMAR_ID:
                 self.simar = Simar_addr()
@@ -83,7 +83,7 @@ class AutoConfig:
             read_usb = self.read_folder()
             self.status = True
 
-        elif (currentIPvalue[:7] != '10.128.') or (currentIPvalue[:5] != '10.0.'):
+        elif (currentIPvalue[:7] != '10.128.') and (currentIPvalue[:5] != '10.0.') and (currentIPvalue[:8] != '10.20.26'):
             logger.error("Unknown IP {}. Wait a valid one! Restarting service...".format(
                                 currentIPvalue,
                             )

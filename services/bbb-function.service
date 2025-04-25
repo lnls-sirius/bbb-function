@@ -8,7 +8,6 @@ Restart=always
 RestartSec=3
 Type=simple 
 WorkingDirectory=/root/bbb-function/
-ExecStartPre=/bin/sleep 5
 ExecStart=/bin/bash /root/bbb-function/src/run-functions.sh
 StandardOutput=syslog
 StandardError=syslog

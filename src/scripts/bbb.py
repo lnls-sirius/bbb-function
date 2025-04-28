@@ -331,9 +331,9 @@ class Sector:
     """
 
     SECTORS = (
-        ["LinacArea"]
+        ["LINAC Area"]
         + [("IA-" + str(i).zfill(2)) for i in range(1, 21)]
-        + ["TransportLines", "Connectivity", "PowerArea", "RFArea", "Others"]
+        + ["Transport Lines", "Connectivity", "Power Area", "RF Area", "Others"]
     )
     SUBNETS = (
         [[ipaddress.ip_network("10.128.1.0/24"), ipaddress.ip_network("10.128.255.0/24")]]
@@ -344,18 +344,18 @@ class Sector:
 
 
     SECTORS_DICT = {}
-    SECTORS_DICT[str(ipaddress.ip_network("10.128.1.0/24"))] = "LinacArea"
+    SECTORS_DICT[str(ipaddress.ip_network("10.128.1.0/24"))] = "LINAC Area"
 
     for i in range(1, 21):
         SECTORS_DICT[str(ipaddress.ip_network("10.128.{}.0/24".format(i + 100)))] = "IA-{}".format(
             str(i).zfill(2)
         )
 
-    SECTORS_DICT[str(ipaddress.ip_network("10.128.121.0/24"))] = "TransportLines"
+    SECTORS_DICT[str(ipaddress.ip_network("10.128.121.0/24"))] = "Transport Lines"
     SECTORS_DICT[str(ipaddress.ip_network("10.128.122.0/24"))] = "Connectivity"
 
     for i in range(31, 38):
-        SECTORS_DICT[str(ipaddress.ip_network("10.128.{}.0/24".format(i + 100)))] = "PowerArea"
+        SECTORS_DICT[str(ipaddress.ip_network("10.128.{}.0/24".format(i + 100)))] = "Power Area"
 
 
     @staticmethod

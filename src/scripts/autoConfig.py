@@ -82,12 +82,9 @@ class AutoConfig:
             logger.info("SPIXCONV")
             read_usb = self.read_folder()
             self.status = True
-
+    
         elif (currentIPvalue[:7] != '10.128.') or (currentIPvalue[:5] != '10.0.'):
-            logger.error("Unknown IP {}. Wait a valid one! Restarting service...".format(
-                                currentIPvalue,
-                            )
-                )
+            logger.error("Unknown IP {}. Wait a valid one! Restarting service...".format(currentIPvalue))
             system('systemctl restart bbb-function')
 
     def get_ip(self):
@@ -261,20 +258,23 @@ if __name__ == "__main__":
                 )
                 system('systemctl restart bbb-function')
 
-
-        # IT network, ISP laboratory. Then:
-        elif(mybbb.type == "SPIxCONV" and mybbb.currentSubnet == "28"):
-            mybbb.update_ip_address(
-                "manual",
-                new_ip_address="10.0.28.190",
-                new_mask="255.255.255.0",
-                new_gateway="10.0.28.1",
-            )
-            logger.info("IT infrastructure, ISP lab! IP {} and BBB hostname: {}".format("10.0.28.190", mybbb.name))
-            mybbb.update_hostname(mybbb.name)
-
-
-
+        # Handle SPIxCONV special cases
+        elif mybbb.type == "SPIxCONV":
+            # SPIxCONV inside IT infrastructure, ISP lab. Setting static IP.
+            if mybbb.currentSubnet == "28":
+                mybbb.update_ip_address(
+                    "manual",
+                    new_ip_address = "10.0.28.190",
+                    new_mask = "255.255.255.0",
+                    new_gateway = "10.0.28.1",
+                )
+                mybbb.update_hostname(mybbb.name)
+                logger.info("SPIxCONV inside IT infrastructure, ISP lab. Configured IP {} and BBB hostname: {}".format("10.0.28.190", mybbb.name))
+            
+            # SPIxCONV outside known infrastructure. Configuring hostname only.
+            else:
+                mybbb.update_hostname(mybbb.name)
+                logger.info("SPIxCONV outside known infrastructure. Configured hostname only: {}".format(mybbb.name))
 
         # If BBB not found, keep DHCP and raise a flag!
         else:

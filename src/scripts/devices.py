@@ -216,6 +216,7 @@ def power_supply_pru():
         11: "FAC_DCDC_EMA",
         12: "FAP_2P2S_Master",
         13: "FAP_2P2S_Slave",
+        16: "DAT_SWLS",
         31: "UNDEFINED",
     }
     if GPIO.input(PIN_FTDI_PRU) == PRU and GPIO.input(PIN_RS232_RS485) == RS485 and PRUserial485_address() == 21:

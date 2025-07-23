@@ -83,12 +83,21 @@ class AutoConfig:
             read_usb = self.read_folder()
             self.status = True
 
+
         elif (currentIPvalue[:7] != '10.128.') and (currentIPvalue[:5] != '10.0.') and (currentIPvalue[:8] != '10.20.26'):
             logger.error("Unknown IP {}. Wait a valid one! Restarting service...".format(
                                 currentIPvalue,
                             )
                 )
             system('systemctl restart bbb-function')
+
+
+        """
+        # DHCP Workaround: Setting this to false so that it keeps its
+        # already configured static IP
+        """
+        self.status = False
+
 
     def get_ip(self):
         s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)

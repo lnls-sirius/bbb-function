@@ -28,8 +28,8 @@ CONFIGURED_SUBNETS = ["101", "102", "103", "104", "105", "106", \
 
 # IP Infras
 CONTROLS_INFRA = "10.128."
-ISP_INFRA = "10.20.11."
-ISP_GIE_INFRA = "10.20."
+EPP_INFRA = "10.20.11."
+EPP_GIE_INFRA = "10.20."
 DAT_INFRA = "10.0.4."
 
 
@@ -49,7 +49,7 @@ class AutoConfig:
         """
         currentIPvalue = self.get_ip()
         if((currentIPvalue.split(".")[2] in CONFIGURED_SUBNETS) and (currentIPvalue.startswith(CONTROLS_INFRA))) \
-            or (currentIPvalue.startswith(ISP_INFRA)) \
+            or (currentIPvalue.startswith(EPP_INFRA)) \
             or (currentIPvalue.startswith(DAT_INFRA)):
                 # COUNTINGPRU
                 if self.boardID == COUNTINGPRU_SIMAR_ID:
@@ -94,7 +94,7 @@ class AutoConfig:
 
         elif not(currentIPvalue.startswith(CONTROLS_INFRA)) \
             and not(currentIPvalue.startswith(DAT_INFRA)) \
-            and not(currentIPvalue.startswith(ISP_GIE_INFRA)):
+            and not(currentIPvalue.startswith(EPP_GIE_INFRA)):
                 logger.error("Unknown IP {}. Wait a valid one! Restarting service...".format(
                                     currentIPvalue,
                                 )
@@ -277,7 +277,7 @@ if __name__ == "__main__":
 
 
         # IT network, ISP laboratory. Then:
-        elif(mybbb.type == "SPIxCONV" and mybbb.currentIP.startswith(ISP_INFRA)):
+        elif(mybbb.type == "SPIxCONV" and mybbb.currentIP.startswith(EPP_INFRA)):
             mybbb.update_ip_address(
                 "manual",
                 new_ip_address="10.20.11.190",

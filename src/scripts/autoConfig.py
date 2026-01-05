@@ -48,8 +48,8 @@ class AutoConfig:
         Check whether AUTOCONFIG is enabled only for some subnets
         """
         currentIPvalue = self.get_ip()
-        if((currentIPvalue.split(".")[2] in CONFIGURED_SUBNETS) and (currentIPvalue.startswith(CONTROLS_INFRA)))
-            or (currentIPvalue.startswith(ISP_INFRA))
+        if((currentIPvalue.split(".")[2] in CONFIGURED_SUBNETS) and (currentIPvalue.startswith(CONTROLS_INFRA))) \
+            or (currentIPvalue.startswith(ISP_INFRA)) \
             or (currentIPvalue.startswith(DAT_INFRA)):
                 # COUNTINGPRU
                 if self.boardID == COUNTINGPRU_SIMAR_ID:
@@ -92,8 +92,8 @@ class AutoConfig:
             read_usb = self.read_folder()
             self.status = True
 
-        elif not(currentIPvalue.startswith(CONTROLS_INFRA))
-            and not(currentIPvalue.startswith(DAT_INFRA))
+        elif not(currentIPvalue.startswith(CONTROLS_INFRA)) \
+            and not(currentIPvalue.startswith(DAT_INFRA)) \
             and not(currentIPvalue.startswith(ISP_GIE_INFRA)):
                 logger.error("Unknown IP {}. Wait a valid one! Restarting service...".format(
                                     currentIPvalue,
@@ -233,7 +233,7 @@ if __name__ == "__main__":
             subnet = mybeagle_config[BBB_IP_1_COLUMN].split(".")[2]
 
             # Update IP, if available
-            if currentIPvalue.startswith(CONTROLS_INFRA):
+            if mybbb.currentIP.startswith(CONTROLS_INFRA):
                 if (IP_AVAILABLE_1 or IP_AVAILABLE_2) and subnet == mybbb.currentSubnet:
                     if IP_AVAILABLE_1:
                         new_ip = mybeagle_config[BBB_IP_1_COLUMN]
@@ -277,7 +277,7 @@ if __name__ == "__main__":
 
 
         # IT network, ISP laboratory. Then:
-        elif(mybbb.type == "SPIxCONV" and currentIPvalue.startswith(ISP_INFRA)):
+        elif(mybbb.type == "SPIxCONV" and mybbb.currentIP.startswith(ISP_INFRA)):
             mybbb.update_ip_address(
                 "manual",
                 new_ip_address="10.20.11.190",
@@ -324,7 +324,7 @@ if __name__ == "__main__":
 
 
                 # Update IP, if available
-                if mybbb.currentIP[:7] == '10.128.':
+                if mybbb.currentIP.startswith(CONTROLS_INFRA):
                     if (IP_AVAILABLE_1 or IP_AVAILABLE_2) and subnet == mybbb.currentSubnet:
                         if IP_AVAILABLE_1:
                             new_ip = mybeagle_config[BBB_IP_1_COLUMN]

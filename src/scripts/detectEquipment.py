@@ -74,14 +74,14 @@ if __name__ == "__main__":
     while not path.isfile(RES_FILE) or not path.isfile(BAUDRATE_FILE):
         logger.info('Searching...')
         try:
-            simar()
-            spixconv()
-            counting_pru()
-            power_supply_pru()
-            thermo_probe()
-            mbtemp()
-            agilent4uhv()
-            mks9376b()
+            power_supply_pru()  # Power supplies
+            mks9376b()          # Vacuum gauges
+            agilent4uhv()       # Ion pumps
+            spixconv()          # Pulsed magnets
+            mbtemp()            # Temperature measurements
+            counting_pru()      # Gamma detectors
+            # simar()
+            # thermo_probe()
             # no_tty()
         except SystemExit:
             exit()

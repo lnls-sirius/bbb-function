@@ -124,7 +124,11 @@ class GetData:
     def __init__(self, csconsts_url = CONTROL_SYSTEM_CONSTS_AUTOCONFIG_FILE, datafile=AUTOCONFIG_FILE, subnet=""):
         try:
             logger.info("Retrieving AUTOCONFIG file from control-system-constants")
-            system('wget -c --read-timeout=5 --tries=3 -O {} {}'.format(AUTOCONFIG_FILE, CONTROL_SYSTEM_CONSTS_AUTOCONFIG_FILE))
+            ret = system('wget --read-timeout=5 --tries=3 -O {} {}'.format(AUTOCONFIG_FILE_TMP, CONTROL_SYSTEM_CONSTS_AUTOCONFIG_FILE))
+            if ret == 0:
+                system("mv {} {}".format(AUTOCONFIG_FILE_TMP, AUTOCONFIG_FILE))
+            else:
+                system("rm -f {}".format(AUTOCONFIG_FILE_TMP))
 
             if ".xlsx" in AUTOCONFIG_FILE:
                 _sheet = open_workbook(datafile).sheet_by_name(subnet)

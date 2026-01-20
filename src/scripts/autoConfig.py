@@ -26,6 +26,13 @@ CONFIGURED_SUBNETS = ["101", "102", "103", "104", "105", "106", \
 "131", "132", "133", "134", "135", "136", "137"]
 
 
+# IP Infras
+CONTROLS_INFRA = "10.128."
+EPP_INFRA = "10.20.11."
+EPP_GIE_INFRA = "10.20."
+DAT_INFRA = "10.0.4."
+
+
 class AutoConfig:
     def __init__(self):
         self.boardID = PRUserial485_address()
@@ -41,41 +48,43 @@ class AutoConfig:
         Check whether AUTOCONFIG is enabled only for some subnets
         """
         currentIPvalue = self.get_ip()
-        if((currentIPvalue.split(".")[2] in CONFIGURED_SUBNETS) and (currentIPvalue[:7] == '10.128.')) or (currentIPvalue[:8] == '10.0.28.') or (currentIPvalue[:7] == '10.0.4.'):
-            # COUNTINGPRU
-            if self.boardID == COUNTINGPRU_SIMAR_ID:
-                self.simar = Simar_addr()
-                self.counter = CountingPRU_addr()
+        if((currentIPvalue.split(".")[2] in CONFIGURED_SUBNETS) and (currentIPvalue.startswith(CONTROLS_INFRA))) \
+            or (currentIPvalue.startswith(EPP_INFRA)) \
+            or (currentIPvalue.startswith(DAT_INFRA)):
+                # COUNTINGPRU
+                if self.boardID == COUNTINGPRU_SIMAR_ID:
+                    self.simar = Simar_addr()
+                    self.counter = CountingPRU_addr()
 
-                if self.simar.identified:
-                    for _ in range(5):
-                        self.status = self.simar.autoConfig_Available()
-                        if self.status:
-                            break
-                        sleep(2)
-                else:
-                    system("/root/counting-pru/src/pinconfig_counting-pru.sh")
-                    for i in range(5):
-                        self.status = self.counter.autoConfig_Available()
-                        if self.status:
-                            break
-                        sleep(2)
-
-            # SERIALxxCON - AUTOCONFIG: RTS and CTS pins tied together (jumper)
-            elif self.boardID == SERIALXXCON_ID:
-                read_usb = self.read_folder()
-
-                if(read_usb.find('ttyUSB') != -1):
-                    for i in range(5):
-                        try:
-                            self.status = serial.Serial("/dev/ttyUSB0").cts
-                        except:
-                            self.status = False
+                    if self.simar.identified:
+                        for _ in range(5):
+                            self.status = self.simar.autoConfig_Available()
+                            if self.status:
+                                break
+                            sleep(2)
+                    else:
+                        system("/root/counting-pru/src/pinconfig_counting-pru.sh")
+                        for i in range(5):
+                            self.status = self.counter.autoConfig_Available()
+                            if self.status:
+                                break
                             sleep(2)
 
-            elif self.boardID == SPIXCONV_ID:
-                read_usb = self.read_folder()
-                self.status = True
+                # SERIALxxCON - AUTOCONFIG: RTS and CTS pins tied together (jumper)
+                elif self.boardID == SERIALXXCON_ID:
+                    read_usb = self.read_folder()
+
+                    if(read_usb.find('ttyUSB') != -1):
+                        for i in range(5):
+                            try:
+                                self.status = serial.Serial("/dev/ttyUSB0").cts
+                            except:
+                                self.status = False
+                                sleep(2)
+
+                elif self.boardID == SPIXCONV_ID:
+                    read_usb = self.read_folder()
+                    self.status = True
 
         # SPIxCONV
         elif self.boardID == SPIXCONV_ID:
@@ -83,12 +92,14 @@ class AutoConfig:
             read_usb = self.read_folder()
             self.status = True
 
-        elif (currentIPvalue[:7] != '10.128.') and (currentIPvalue[:5] != '10.0.') and (currentIPvalue[:8] != '10.20.26'):
-            logger.error("Unknown IP {}. Wait a valid one! Restarting service...".format(
-                                currentIPvalue,
-                            )
-                )
-            system('systemctl restart bbb-function')
+        elif not(currentIPvalue.startswith(CONTROLS_INFRA)) \
+            and not(currentIPvalue.startswith(DAT_INFRA)) \
+            and not(currentIPvalue.startswith(EPP_GIE_INFRA)):
+                logger.error("Unknown IP {}. Wait a valid one! Restarting service...".format(
+                                    currentIPvalue,
+                                )
+                    )
+                system('systemctl restart bbb-function')
 
     def get_ip(self):
         s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -222,7 +233,7 @@ if __name__ == "__main__":
             subnet = mybeagle_config[BBB_IP_1_COLUMN].split(".")[2]
 
             # Update IP, if available
-            if mybbb.currentIP[:7] == '10.128.':
+            if mybbb.currentIP.startswith(CONTROLS_INFRA):
                 if (IP_AVAILABLE_1 or IP_AVAILABLE_2) and subnet == mybbb.currentSubnet:
                     if IP_AVAILABLE_1:
                         new_ip = mybeagle_config[BBB_IP_1_COLUMN]
@@ -266,14 +277,14 @@ if __name__ == "__main__":
 
 
         # IT network, ISP laboratory. Then:
-        elif(mybbb.type == "SPIxCONV" and mybbb.currentSubnet == "28"):
+        elif(mybbb.type == "SPIxCONV" and mybbb.currentIP.startswith(EPP_INFRA)):
             mybbb.update_ip_address(
                 "manual",
-                new_ip_address="10.0.28.190",
+                new_ip_address="10.20.11.190",
                 new_mask="255.255.255.0",
-                new_gateway="10.0.28.1",
+                new_gateway="10.20.11.1",
             )
-            logger.info("IT infrastructure, ISP lab! IP {} and BBB hostname: {}".format("10.0.28.190", mybbb.name))
+            logger.info("IT infrastructure, ISP lab! IP {} and BBB hostname: {}".format("10.20.11.190", mybbb.name))
             mybbb.update_hostname(mybbb.name)
 
 
@@ -313,7 +324,7 @@ if __name__ == "__main__":
 
 
                 # Update IP, if available
-                if mybbb.currentIP[:7] == '10.128.':
+                if mybbb.currentIP.startswith(CONTROLS_INFRA):
                     if (IP_AVAILABLE_1 or IP_AVAILABLE_2) and subnet == mybbb.currentSubnet:
                         if IP_AVAILABLE_1:
                             new_ip = mybeagle_config[BBB_IP_1_COLUMN]

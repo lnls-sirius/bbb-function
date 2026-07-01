@@ -172,7 +172,7 @@ def counting_pru():
     """
     CountingPRU
     """
-    logger.debug("Counting PRU")
+    logger.info("Counting Unit")
     if PRUserial485_address() != 21 and not os.path.exists(PORT):
         counters = CountingPRU_addr()
         os.system("/root/counting-pru/src/pinconfig_counting-pru.sh")
@@ -200,7 +200,7 @@ def power_supply_pru():
     """
     PRU Power Supply
     """
-    logger.debug("PRU Power Supply")
+    logger.info("PRU Power Supply")
     ps_model_names = {
         0: "Empty",
         1: "FBP",
@@ -259,7 +259,7 @@ def thermo_probe():
     """
     Thermo probes
     """
-    logger.debug("Thermo probes")
+    logger.info("Thermo probes")
     if (
         GPIO.input(PIN_FTDI_PRU) == FTDI
         and GPIO.input(PIN_RS232_RS485) == RS485
@@ -332,7 +332,7 @@ def mks9376b():
     """
     MKS 937B
     """
-    logger.debug("MKS 937B")
+    logger.info("Pressure Gauges - MKS 937B")
     if (
         GPIO.input(PIN_FTDI_PRU) == FTDI
         and GPIO.input(PIN_RS232_RS485) == RS485
@@ -373,7 +373,7 @@ def agilent4uhv():
     """
     AGILENT 4UHV
     """
-    logger.debug("AGILENT 4UHV")
+    logger.info("Ion Pumps - Agilent 4UHV")
     if (
         GPIO.input(PIN_FTDI_PRU) == FTDI
         and GPIO.input(PIN_RS232_RS485) == RS485
@@ -408,7 +408,7 @@ def spixconv():
     """
     SPIxCONV
     """
-    logger.info("SPIxCONV")
+    logger.info("Pulsed Magnets - SPIxCONV")
 
     if not SPIxCONV:
         return

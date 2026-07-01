@@ -31,6 +31,7 @@ CONTROLS_INFRA = "10.128."
 EPP_INFRA = "10.20.11."
 EPP_GIE_INFRA = "10.20."
 DAT_INFRA = "10.0.4."
+DAT_INFRA_2 = "10.0.28."
 
 
 class AutoConfig:
@@ -50,7 +51,8 @@ class AutoConfig:
         currentIPvalue = self.get_ip()
         if((currentIPvalue.split(".")[2] in CONFIGURED_SUBNETS) and (currentIPvalue.startswith(CONTROLS_INFRA))) \
             or (currentIPvalue.startswith(EPP_INFRA)) \
-            or (currentIPvalue.startswith(DAT_INFRA)):
+            or (currentIPvalue.startswith(DAT_INFRA)) \
+            or (currentIPvalue.startswith(DAT_INFRA_2)):
                 # COUNTINGPRU
                 if self.boardID == COUNTINGPRU_SIMAR_ID:
                     self.simar = Simar_addr()
@@ -94,6 +96,7 @@ class AutoConfig:
 
         elif not(currentIPvalue.startswith(CONTROLS_INFRA)) \
             and not(currentIPvalue.startswith(DAT_INFRA)) \
+            and not(currentIPvalue.startswith(DAT_INFRA_2)) \
             and not(currentIPvalue.startswith(EPP_GIE_INFRA)):
                 logger.error("Unknown IP {}. Wait a valid one! Restarting service...".format(
                                     currentIPvalue,
